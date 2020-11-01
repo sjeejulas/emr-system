@@ -1,0 +1,33 @@
+{% load static %}
+
+<div class="col-12">&nbsp;</div>
+<h4><strong><span style="color: #212528;">Step 4: </span>&nbsp; Let us check that eMR can communicate with your EMISweb system</strong></h4>
+<div class="emr-setup-card">
+    <div class="card-body">
+        <p> This allows eMR to use that new user account in order to securely process your medical records when you need it. </p>
+        <div class="row">
+            <div class="col-md-5">
+                <p>
+                    Click the "Check setup" button to the right.
+                </p>
+                <p>
+                    If we can communicate with your EMISweb successfully, you will be ready to start preparing medical reports with eMR!
+                </p>
+            </div>
+            <div class="col-md-7 checkingEmis">
+                <div class="col-md-7 emisSetupSuccess d-none">
+                    <pre> <span style="color: #33aea0; font-size: 30px"><i class="fas fa-check"></i>  Connected!</span></pre>
+                    <p class="mb-0">
+                        Your Surgery is now ready to process medical records.
+                    </p>
+                    <p>
+                        <a href="{% url 'accounts:login' %}" style="color: #33aea0; font-size: 18px"><strong>Click here</strong></a> to be taken to the sign-in screen.
+                    </p>
+                </div>
+                <button class="btn btn-checkSetup" onclick="this.disabled=true; pollingEmis('{% url "onboarding:emis_polling" practice_code %}')" type="button" id="checkingEmisButton">
+                    <i class="fas fa-question"></i>&nbsp; Check Setup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

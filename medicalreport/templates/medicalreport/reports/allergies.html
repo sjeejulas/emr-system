@@ -1,0 +1,29 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+{% load final_report_tags %}
+<div style="display:flex;background-color:#235597;margin:0;">
+    <label class="header-medical-section">Allergies</label>
+</div>
+<div></div>
+{% if all_allergies %}
+    <table style="width:100%;font-size:15px;margin-top:10px;">
+        {% for model in all_allergies %}
+            {% with header=model|general_header:toolbox_params  %} 
+                <tr>
+                    <td>{{ header }}</td>
+                </tr>
+            {% endwith %}
+        {% endfor %}
+    </table>
+{% endif %}
+{% if additional_allergies %}
+    <hr class='no-top-margin'/>
+    <h6 style="font-size: 15px; margin-bottom: 0px">Added</h6>
+    <table style="width:100%;font-size:15px;">
+        {% for record in additional_allergies %}
+            <tr>
+                <td>{{ record|additional_allergy_description:word_library }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}

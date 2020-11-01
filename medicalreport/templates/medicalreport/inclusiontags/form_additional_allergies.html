@@ -1,0 +1,16 @@
+{% load custom_filters %}
+{% if additional_allergies_records %}
+  <hr class='no-top-margin'/>
+  <h6 class='no-bottom-margin'>Added</h6>
+  {% for record in additional_allergies_records %}
+    <div>
+    <label class="redaction-checkbox">
+      <input name="additional_allergies_records_delete" 
+        {{ checked }} readonly type="checkbox" class="redaction-checkbox__input" 
+        value="{{ record.id }}">
+      <span class="redaction-checkbox__icon float-right fas fa-check-circle"></span>
+      <span class="redaction-checkbox__header">{{ record|additional_allergy_description:word_library }}</span>
+    </label>
+    </div>
+  {% endfor %}
+{% endif %}

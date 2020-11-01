@@ -1,0 +1,17 @@
+{% load custom_filters %}
+{% if additional_medication_records %}
+  <hr class='no-top-margin'/>
+  <h6 class='no-bottom-margin'>Added</h6>
+  {% for record in additional_medication_records %}
+    <div>
+    <label class="redaction-checkbox">
+      <input name="additional_medication_records_delete" 
+             readonly type="checkbox" class="redaction-checkbox__input" 
+        value="{{ record.id }}">
+      <span class="redaction-checkbox__icon float-right fas fa-check-circle"></span>
+      <span class="redaction-checkbox__header">{{ record|additional_medication_header }}</span>
+      <span class="redaction-checkbox__text">{{ record|additional_medication_body }}</span>
+    </label>
+    </div>
+  {% endfor %}
+{% endif %}

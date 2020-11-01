@@ -1,0 +1,25 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div style="display:flex;background-color:#235597;margin:0;">
+    <label class="header-medical-section">Patient Profile</label>
+</div>
+<div></div>
+{% if profile_events %}
+    <table style="width:100%;font-size:15px;margin-top:10px;border: 1px solid black;margin-bottom:10px;">
+        {% for key, value in profile_events.items %}
+            <tr>
+                <td style="font-weight:bold;padding:5px;">{{ key|profile_event_value_header }}</td>
+                {% for event in value %}
+                    {% if forloop.counter|mod_column and forloop.counter != forloop.first %}
+                        </tr>
+                        <tr>
+                            <td/>
+                            <td style="padding:5px;">{{ event|event_value_body|safe }}</td>
+                    {% else %}
+                        <td style="padding:5px;">{{ event|event_value_body|safe }}</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}

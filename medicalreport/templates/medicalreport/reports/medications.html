@@ -1,0 +1,70 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+{% load final_report_tags %}
+<div style="display:flex;background-color:#235597;margin:0;">
+    <label class="header-medical-section">Acute medications</label>
+</div>
+<div></div>
+{% if acute_medications or redaction.acute_prescription_notes|default:"" %}
+    <table style="width:100%;font-size:15px;margin-top:10px;">
+        {% for model in acute_medications %}
+            {% with new_toolbox_params=toolbox_params|modify_section:'acute_medications' %}
+                {% with header=model|general_header:new_toolbox_params %}
+                    <tr>
+                        <td>{{ header }}</td>
+                    </tr>
+                {% endwith %}
+            {% endwith %}
+        {% endfor %}
+        {% if redaction.repeat_prescription_notes|default:"" %}
+            <tr>
+                <td><label style="font-weight:bold;">Additional contextual information</label> : {{redaction.acute_prescription_notes}}</td>
+            </tr>
+        {% endif %}
+    </table>
+{% endif %}
+{% if additional_acute_medications %}
+    <hr class='no-top-margin'/>
+    <h6 style="font-size: 15px; margin-bottom: 0px">Added</h6>
+    <table style="width:100%;font-size:15px;">
+        {% for record in additional_acute_medications %}
+            <tr>
+                <td>{{ record|additional_medication_header }}</td>
+                <td>{{ record|additional_medication_body }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+<div style="display:flex;background-color:#235597;height: 30px">
+    <label class="header-medical-section">Repeat medications</label>
+</div>
+{% if repeat_medications or redaction.repeat_prescription_notes|default:"" %}
+    <table style="width:100%;font-size:15px;margin-top:10px;">
+        {% for model in repeat_medications %}
+            {% with new_toolbox_params=toolbox_params|modify_section:'repeat_medications' %}
+                {% with header=model|general_header:new_toolbox_params %}
+                    <tr>
+                        <td>{{ header }}</td>
+                    </tr>
+                {% endwith %}
+            {% endwith %}
+        {% endfor %}
+        {% if redaction.repeat_prescription_notes|default:"" %}
+            <tr>
+                <td><label style="font-weight:bold;">Additional contextual information</label> : {{redaction.repeat_prescription_notes}}</td>
+            </tr>
+        {% endif %}
+    </table>
+{% endif %}
+{% if additional_repeat_medications %}
+    <hr class='no-top-margin'/>
+    <h6 style="font-size: 15px; margin-bottom: 0px">Added</h6>
+    <table style="width:100%;font-size:15px;margin-top: 0;">
+        {% for record in additional_repeat_medications %}
+            <tr>
+                <td>{{ record|additional_medication_header }}</td>
+                <td>{{ record|additional_medication_body }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}

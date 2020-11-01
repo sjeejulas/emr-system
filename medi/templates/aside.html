@@ -1,0 +1,82 @@
+{% load static %}
+
+<aside class="left-panel" id="aside-panel">
+    <nav class="navigation navbar-dark">
+        <div class="sidebar-header">
+            <div class="logo">
+                {% if user.type == 'GP' or user.type == 'MEDI' or not user.type %}
+                    <img src="{% static "images/logo/eMR_med.png" %}">
+                {% else %}
+                    <img src="{% static "images/logo/mdX_med.png" %}">
+                {% endif %}
+            </div>
+            <div class="profile">
+                <h3>{{ user.first_name }}  {{ user.last_name }}</h3>
+                <p>{{ user.get_my_role }}</p>
+            </div>
+        </div>
+        <ul class="mainmenu">
+            {% if user.type == 'GP' and user.userprofilebase.generalpracticeuser.organisation.is_active or user.type == 'CLT' or user.type == 'MEDI' %}
+                {% if perms.instructions.add_instruction %}
+                    <li class="{% if request.resolver_match.url_name == 'new_instruction' %}active{% endif %}">
+                        <a href="{% url 'instructions:new_instruction' %}">New Instructions</a>
+                    </li>
+                {% endif %}
+                {% if perms.instructions.view_instruction %}
+                    <li class="{% if request.resolver_match.url_name == 'view_pipeline' %}active{% endif %}">
+                        <a href="{% url 'instructions:view_pipeline' %}" ><i class="fas fa-tasks"></i>Instruction Pipeline</a>
+                    </li>
+                {% endif %}
+                {% if perms.organisations.view_user_management %}
+                    <li class="{% if request.resolver_match.url_name == 'view_users' %}active{% endif %}">
+                        <a href="{% url 'accounts:view_users' %}"><i class="fas fa-users-cog"></i>User Management</a>
+                    </li>
+                {% endif %}
+                {% if perms.template.view_templateinstruction and user.type != 'GP' %}
+                    <li class="{% if request.resolver_match.url_name == 'view_templates' %}active{% endif %}">
+                        <a href="{% url 'template:view_templates' %}"><i class="fas fa-wrench"></i>Templates</a>
+                    </li>
+                {% endif %}
+                {% if perms.instructions.view_account_pages %}
+                    <li class="{% if request.resolver_match.url_name == 'view_account' %}active{% endif %}">
+                        {% if user.type == 'GP' %}
+                            <a href="{% url 'accounts:view_account' %}" ><i class="fas fa-money-check-alt"></i>Fee Management</a>
+                        {% elif user.type == 'CLT'%}
+                            <a href="{% url 'accounts:view_fee' %}" ><i class="fas fa-money-check-alt"></i>Fees</a>
+                        {% endif %}
+                    </li>
+                {% endif %}
+                {% if perms.instructions.view_summary_report %}
+                    <li class="{% if request.resolver_match.url_name == 'summary-report' %}active{% endif %}">
+                        <a href="{% url 'report:summary-report' %}"><i class="fas fa-chart-bar"></i>Dashboard</a>
+                    </li>
+                {% endif %}
+                {% if perms.library.view_library %}
+                    <li class="{% if request.resolver_match.url_name == 'edit_library' %}active{% endif %}">
+                        <a href="{% url 'library:edit_library' event='index' %}"><i class="fas fa-book-open"></i>Surgery Library</a>
+                    </li>
+                {% endif %}
+                {% if user.type == 'GP' %}
+                    <li class="{% if request.resolver_match.url_name == 'surgery_management' %}active{% endif %}">
+                        <a href="{% url 'organisations:surgery_management' %}" ><i class="fas fa-hospital"></i>Surgery Management</a>
+                    </li>
+                {% endif %}
+                <li class="{% if request.resolver_match.url_name == 'view_invoice_payment_pipeline' %}active{% endif %}">
+                    <a href="{% url 'instructions:view_invoice_payment_pipeline' %}" ><i class="fas fa-tasks"></i>Invoicing and Payments</a>
+                </li>
+                <li class="{% if request.resolver_match.url_name == 'resource_centre' %}active{% endif %}">
+                    <a href="{% url 'help:resource_centre' %}"><i class="far fa-question-circle"></i>Resource Centre</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</aside>
+{% block Script %}
+  <script>
+      var APP_ID = "ch0w7zit";
+      window.intercomSettings = {
+          app_id: APP_ID
+      };
+      (function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',w.intercomSettings);}else{var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.Intercom=i;var l=function(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/' + APP_ID;var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);};if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})();
+  </script>
+{% endblock %}

@@ -1,0 +1,437 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+
+{% block ExtraHead %}
+    <link href="{% static 'css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/strongPass.css' %}" rel="stylesheet">
+    <link href="{% static 'css/onboarding/onboarding.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block Content %}
+    {% include 'onboarding/progress_bar_onboard.html' %}
+    <form id="step_form" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="step1">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>About your surgery</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row subheader">
+                        <div class="col-12">
+                            <p>To be completed by an authorised member of the practice</p>
+                            <p class="mb-0">You can use your Practice Code or Surgery name to search for your Surgery, but if any information is incorrect please feel free to overwrite with the correct details.</p>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-12">
+                            <h5>Surgery details</h5>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6">
+                            <div class="row" id="practice_form">
+                                <div class="col-md-4 title-pos font-weight-bold">Practice Code <span class="red">*</span></div>
+                                {% bootstrap_field surgery_form.practice_code show_label=False form_group_class='col-md-7' placeholder='' %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4 title-pos">Surgery Name <span class="red">*</span></div>
+                                {% bootstrap_field surgery_form.surgery_name show_label=False form_group_class='col-md-7' placeholder='' %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4 title-pos">Postcode <span class="red">*</span></div>
+                                {% bootstrap_field surgery_form.postcode show_label=False form_group_class='col-md-7' placeholder='' %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4 title-pos">Find Address</div>
+                                {% bootstrap_field surgery_form.address show_label=False form_group_class='col-md-7' placeholder='' %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4 title-pos">Address Line 1 <span class="red">*</span></div>
+                                {% bootstrap_field surgery_form.address_line1 show_label=False form_group_class='col-md-7' placeholder='' %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4 title-pos">Address Line 2</div>
+                                {% bootstrap_field surgery_form.address_line2 show_label=False form_group_class='col-md-7' placeholder='' %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4 title-pos">Address Line 3</div>
+                                {% bootstrap_field surgery_form.address_line3 show_label=False form_group_class='col-md-7' placeholder='' %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4 title-pos">City <span class="red">*</span></div>
+                                {% bootstrap_field surgery_form.city show_label=False form_group_class='col-md-7' placeholder='' %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4 title-pos">County</div>
+                                {% bootstrap_field surgery_form.county show_label=False form_group_class='col-md-7' placeholder='' %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4 title-pos">Contact Number <span class="red">*</span></div>
+                                {% bootstrap_field surgery_form.contact_num show_label=False form_group_class='col-md-7' placeholder='' %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="id_operating_system" class="col-form-label">Primary Care System<span class="red">*</span></label>
+                                </div>
+                                {% bootstrap_field surgery_form.operating_system show_label=False form_group_class='col-md-7' placeholder='' %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-4">Clinical System Code<span class="red">*</span></div>
+                                {% bootstrap_field surgery_form.emis_org_code show_label=False form_group_class='col-md-7' placeholder='' %}
+                                <div class="col-md-1" style="padding-left: 0px;">
+                                    <img class="info-icon" id="clinical_info_icon" src="{% static 'images/infoiconemr.png' %}">
+                                    <div id="clinical_info">Your Clinical System Code would typically be your EMIS Organisation Code or equivalent.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Central contact email for the Surgery <span class="red">*</span></h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row subheader form-group">
+                        <div class="col-12">
+                            <p>Please provide a central contact email for the Surgery, where all instructions and notifications will be sent (in addition to notification choices of the individual users)</p>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-3"><b>Surgery email</b></div>
+                        <div class="col-md-6">
+                            {% bootstrap_field surgery_email_form.organisation_email placeholder='' %}
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-3"><b>Confirm email</b></div>
+                        <div class="col-md-6">
+                            {% bootstrap_field surgery_email_form.confirm_email placeholder='' %}
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <input type="checkbox" class="accept-policy" name="accept_policy" id="accept-policy" disabled>
+                                Click  <a href="#" class="active-a" data-toggle="modal" data-target="#acceptTCs" id="acceptTCsButton">here</a> to view and accept all T&amp;Cs, End User Licence and data policy.
+                                <p class="mt-2 ml-4 text-secondary">These will appear in a pop-up, so please make sure any pop-up blockers are disabled temporarily to enable this.</p>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <input type="checkbox" id="consentCheckBox" class="consent" name="consented">
+                            <label for="consent">
+                                I consent to MediData Exchange contacting the surgery regarding our services.
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="row">
+                            <div class="col-md-2 mt-3">
+                                <button id="BtnSubmit" class="btn btn-primary btn-lg" type="submit" disabled>Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="modal fade pdf-modal" id="acceptTCs" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog policy-modal" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="container">
+                        <div class="col-12 text-center">
+                            <div class="modal-dialog-pdf">
+                                <iframe id="mediterms_pdf" src="" style="width: 100%; height: 100%;" frameborder="0">
+                                    <p>It appears your web browser doesn't support iframes.</p>
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="goBack" type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Go back</button>
+                    <button id="acceptPolicy" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade confirm-modal" id="confirmModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-body">
+                    The terms and conditions are not accepted. You can proceed but you will not be able to receive or initiate instructions until reviewed and accepted
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button id="closeConfirm" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">Go back and review</button>
+                <button id="proceed" type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Proceed</button>
+            </div>
+        </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/select2.min.js' %}"></script>
+    <script src="{% static 'js/onboarding/emr_signup.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('header').css('display', 'none');
+
+            $('#acceptTCsButton').click(function () {
+                if("{{ request.get_host }}".indexOf('demo') >= 0){
+                    $('#mediterms_pdf').attr('src', "{% static 'documents/TermAndConditions[DEMO].pdf' %}");
+                } else if ("{{ request.get_host }}".indexOf('dev') >= 0){
+                    $('#mediterms_pdf').attr('src', "{% static 'documents/TermAndConditions[DEV].pdf' %}");
+                } else {
+                    $('#mediterms_pdf').attr('src', "{% static 'documents/TermAndConditions.pdf' %}");
+                }
+            });
+            init_select2_postcode(
+                {% if selected_post_code %} ["{{ selected_post_code }}"] {% else %} [''] {% endif %}
+            );
+            init_select2_practice_code(
+                {% if selected_practice_code %} ["{{ selected_practice_code }}"] {% else %} [''] {% endif %},
+                "{% url 'organisations:sign_up_autocomplete' %}"
+            );
+            init_select2_surgery_name(
+                {% if selected_surgery_name %} ["{{ selected_surgery_name }}"] {% else %} [''] {% endif %},
+                "{% url 'organisations:sign_up_autocomplete' %}"
+            );
+
+            $('#id_emis_org_code').prop('required', true);
+            $('#id_operating_system').change(function () {
+                if($(this).val() != 'EMISWeb'){
+                     $('#id_emis_org_code').prop('required', false);
+                } else {
+                    $('#id_emis_org_code').prop('required', true);
+                }
+            });
+
+            $('#acceptPolicy').click(function() {
+              $('#accept-policy').attr("checked", true);
+              $('#accept-policy').trigger('change');
+            });
+            $('#goBack').click(function() {
+              $('#accept-policy').attr("checked", false);
+              $('#accept-policy').trigger('change');
+            });
+
+            $('#step_form').submit(function(event) {
+                $('#accept-policy').removeAttr("disabled");
+                if(!$('#accept-policy:checked').length) {
+                    event.preventDefault();
+                    $('#confirmModal').modal();
+                    $('#proceed').click(function() {
+                        $form.submit();
+                    });
+                }
+            });
+
+            $('#id_postcode').on('change', function () {
+                var url = "{% url 'instructions:api_get_address' address='Address' %}".replace('Address', $(this).val());
+                if($(this).val()){
+                  $.ajax({
+                      type: "GET",
+                      processData: false,
+                      url: url,
+                      success: function (data) {
+                          data.formattedObj = {};
+                          var formattedData = data.addresses.map(function(item) {
+                              var name = item.split(',').filter(function (s) {
+                                  return s != ' ';
+                              }).join(',');
+                              data.formattedObj[name] = item;
+                              return name;
+                          });
+                          $('#id_address').empty();
+                          $('#id_address').select2({
+                              data: formattedData
+                           });
+
+                          if(formattedData.length){
+                              var selectedData = formattedData[0].split(',');
+                              $('#id_address_line1').val(selectedData[0]);
+                              $('#id_address_line2').val(selectedData[1]);
+                              $('#id_address_line3').val(selectedData[2]);
+                              $('#id_address_line4').val(selectedData[3]);
+                              $('#id_city').val(selectedData[5]);
+                              $('#id_county').val(selectedData[6]);
+                              $('#id_address').val(selectedData.join(','));
+                          }
+
+                          $('#id_address').on('select2:select', function (e) {
+                              var selected = e.params.data;
+                              var selectedData;
+
+                              if(data.formattedObj[selected.text]) {
+                                  selectedData = data.formattedObj[selected.text].split(',');
+                              }else {
+                                  selectedData = selected.text.split(',');
+                              }
+                              $('#id_address_line1').val(selectedData[0]);
+                              $('#id_address_line2').val(selectedData[1]);
+                              $('#id_address_line3').val(selectedData[2]);
+                              $('#id_address_line4').val(selectedData[3]);
+                              $('#id_city').val(selectedData[5]);
+                              $('#id_county').val(selectedData[6]);
+                              $('#id_address').val(selectedData.join(','));
+                          });
+                      }
+                  });
+               }
+            });
+
+            $('#id_practice_code').change(function () {
+                $('#id_postcode').empty();
+                $('#id_address').empty();
+                $('#id_surgery_name').empty();
+                init_select2_surgery_name(
+                    [$('#step_form').data('surgery-name')],
+                    "{% url 'organisations:sign_up_autocomplete' %}"
+                );
+
+                init_select2_postcode([$('#id_postcode').data('post-code')]);
+                if($('#id_postcode').data('post-code')){
+                    $('#id_postcode').trigger('change');
+                }
+            });
+
+            $('#accept-policy').change(function () {
+                if($('#accept-policy').is(':checked') == true && 
+                    $('#consentCheckBox').is(':checked') == true) {
+                    $('#BtnSubmit').prop('disabled', false);
+                } else {
+                    $('#BtnSubmit').prop('disabled', true);
+                }
+            });
+            $(".consent").change(function() {
+                if($('#accept-policy').is(':checked') == true && 
+                    $('#consentCheckBox').is(':checked') == true) {
+                    $('#BtnSubmit').prop('disabled', false);
+                } else {
+                    $('#BtnSubmit').prop('disabled', true);
+                }
+            });
+
+            $('#id_surgery_name').change(function () {
+                $('#id_postcode').empty();
+                $('#id_address').empty();
+                $('#id_practice_code').empty();
+                init_select2_practice_code(
+                    [$('#step_form').data('practice-code')],
+                    "{% url 'organisations:sign_up_autocomplete' %}"
+                );
+
+                init_select2_postcode([$('#id_postcode').data('post-code')]);
+                if($('#id_postcode').data('post-code')){
+                    $('#id_postcode').trigger('change');
+                }
+            });
+            $('#id_postcode').trigger('change');
+
+            $('#clinical_info_icon').on("mouseenter", function() {
+                $('#clinical_info').show();
+            }).on("mouseleave", function() {
+                $('#clinical_info').hide();
+            });
+
+            $(document).on({
+                mouseover: function(){
+                    $.ajax({
+                        type: "GET",
+                        url: "{% url 'organisations:get_gp_sign_up_data' %}",
+                        data: {
+                            'code': $(this).text(),
+                            'name': $(this).text()
+                        },
+                        dataType: 'json',
+                        success: function (data) {
+                            if(data.name){
+                                $('#step_form').data('surgery-name', data.name);
+                            } else {
+                                $('#step_form').data(
+                                    'surgery-name',
+                                    $('#select2-id_surgery_name-container').text()
+                                );
+                            }
+
+                            if(data.code){
+                                $('#step_form').data('practice-code', data.code);
+                            } else {
+                                $('#step_form').data(
+                                    'practice-code',
+                                    $('#select2-id_practice_code-container').text()
+                                );
+                            }
+
+                            $('#id_address_line1').val(data.street);
+                            $('#id_city').val(data.city);
+                            $('#id_county').val(data.county);
+                            $('#id_contact_num').val(data.phone_office);
+                            $('#id_postcode').data('post-code', data.postcode);
+                        }
+                    });
+                }
+              },
+              '#select2-id_surgery_name-results > .select2-results__option, #select2-id_practice_code-results > .select2-results__option'
+            );
+        });
+    </script>
+{% endblock %}

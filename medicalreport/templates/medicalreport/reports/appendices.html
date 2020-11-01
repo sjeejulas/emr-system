@@ -1,0 +1,17 @@
+{% load custom_filters %}
+{% load final_report_tags %}
+<div style="display:flex;background-color:#235597; margin: 0; margin-bottom: 15px;">
+    <label class="header-medical-section">Appendices</label>
+</div>
+<div style="margin-top:10px;"></div>
+{% if attachments %}
+    <table style="width:100%;font-size:15px;">
+        {% for attachment in attachments %}
+            {% with header=attachment.parsed_date|format_date_filter|add:" - "|add:attachment.description %}
+                <tr>
+                  <td>{{ header }}</td>
+                </tr>
+            {% endwith %}
+        {% endfor %}
+    </table>
+{% endif %}

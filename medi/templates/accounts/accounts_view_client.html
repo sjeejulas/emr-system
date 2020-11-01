@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load bootstrap4 %}
+{% load render_table from django_tables2 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link rel="stylesheet" href="{% static 'css/dataTables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/instructions/pipeline_views_instructions.css' %}">
+    <link href="{% static 'css/accounts/view_account.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/instructions/new_instruction.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/pretty-checkbox.min.css' %}">
+    <link href="{% static 'css/bootstrap-datepicker.min.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block Content %}
+    <div class="container-fluid" id="block_contain">
+        <div class="card-deck instruction">
+            <div class="col-12">
+                <div class="card contactPreferences mt-2">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-file-invoice-dollar"></i>&nbsp;&nbsp;Invoicing</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="col-md-12">
+                                        {% for k, v in filter_number.items %}
+                                            <div class="number">
+                                                <button class="btn btn-fee text-light" id="{{ k|cut:' ' }}_t2" onclick="invoiceStatusFilter('{{ k }}');">{{ k }} ({{ v }})</button>
+                                            </div>
+                                        {% endfor %}
+                                        <div class="col-md-12">&nbsp;</div>
+                                        <label>Show per page </label>
+                                        <select name="libraryTable_length" id="libraryTable_page_length" class="form-control col-md-2">
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-4 pt-2">
+                                    <form method="POST">
+                                    {% csrf_token %}
+                                        <div class="row">
+                                            {% bootstrap_field date_range_form.from_date form_group_class='col-md-5' show_label=False %}
+                                            {% bootstrap_field date_range_form.to_date form_group_class='col-md-5' show_label=False %}
+                                            {% bootstrap_button 'Search' button_type="submit" button_class="btn-primary btn-block col-md-2" %}
+                                            <input type="hidden" name="status_input" id="id_status_input" value="{{ filter_status }}">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-12">&nbsp;</div>
+                            {% render_table invoicing_table 'django_tables2/bootstrap.html' %}
+                            {% bootstrap_pagination  parameter_name='page' page=invoicing_table.page pages_to_show=5 size='small' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-deck instruction mt-2">
+            <div class="col-12">
+                <div class="card contactPreferences mt-2">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-chart-line"></i>&nbsp;&nbsp;Client fee structure</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-md-4 text-center">
+                                    {% if under_table %}
+                                        <h6 class="text-dark">Underwriting AMRA Table</h6>
+                                        <table class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr class="text-center btn-fee text-light">
+                                                    <th width="50%">No. Instruction</th>
+                                                    <th width="50%">MDX Fee</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for key, value in under_table.items %}
+                                                    <tr class="text-center">
+                                                        <td>{{ key }}</td>
+                                                        <td>£&nbsp;{{ value }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% else %}
+                                        <div class="block-gray h-100 text-center" style="padding:10% 10% 10% 10%">
+                                            <font class="warning_icon text-danger"><i class="fas fa-exclamation-triangle"></i></font>
+                                            <h6 class="text-danger mt-2">Underwriting AMRA Table available.</h6>
+                                            <label class="text-danger">Please contact mediData for available</label>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    {% if claim_table %}
+                                        <h6 class="text-dark">Claims AMRA Table</h6>
+                                        <table class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr class="text-center btn-fee text-light">
+                                                    <th width="50%">No. Instruction</th>
+                                                    <th width="50%">MDX Fee</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for key, value in claim_table.items %}
+                                                    <tr class="text-center">
+                                                        <td>{{ key }}</td>
+                                                        <td>£&nbsp;{{ value }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% else %}
+                                        <div class="block-gray h-100 text-center" style="padding:10% 10% 10% 10%">
+                                            <font class="warning_icon text-danger"><i class="fas fa-exclamation-triangle"></i></font>
+                                            <h6 class="text-danger mt-2">Claims AMRA Table available.</h6>
+                                            <label class="text-danger">Please contact mediData for available</label>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    {% if sars_table %}
+                                        <h6 class="text-dark">SARS Table</h6>
+                                        <table class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr class="text-center btn-fee text-light">
+                                                    <th width="50%">No. Instruction</th>
+                                                    <th width="50%">MDX Fee</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for key, value in sars_table.items %}
+                                                    <tr class="text-center">
+                                                        <td>{{ key }}</td>
+                                                        <td>£&nbsp;{{ value }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% else %}
+                                        <div class="block-gray h-100 text-center" style="padding:10% 10% 10% 10%">
+                                            <font class="warning_icon text-danger"><i class="fas fa-exclamation-triangle"></i></font>
+                                            <h6 class="text-danger mt-2">SARS Table available.</h6>
+                                            <label class="text-danger">Please contact mediData for available</label>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-deck instruction mt-2">
+            <div class="col-12">
+                <div class="card contactPreferences mt-2">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-chart-bar"></i>&nbsp;&nbsp;GP fee structure</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p class="text-danger">
+                                        If instruction recieved before 12.00 noon on a Friday. If after 0 day commences on the Monday.
+                                        Bank Holidays are not included.
+                                    </p>
+                                    <table class='table table-striped table-bordered'>
+                                        <thead>
+                                            <tr class="text-center btn-fee text-light">
+                                                <th width="25%">Days / Band</th>
+                                                <th width="25%">Band 1 (Default)</th>
+                                                <th width="25%">Band 2</th>
+                                                <th width="25%">Band 3</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for key, value in GPRate_table.items %}
+                                                <tr class="text-center">
+                                                    <td class="btn-fee text-light"><strong>{{ key }}&nbsp;Days</strong></td>
+                                                    <td>£&nbsp;{{ value.0 }}</td>
+                                                    <td>£&nbsp;{{ value.1 }}</td>
+                                                    <td>£&nbsp;{{ value.2 }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-deck instruction mt-2">
+            <div class="col-12">
+                <div class="card contactPreferences mt-2">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-comment-dots"></i>&nbsp;&nbsp;Payment Logs</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-md-12">
+                            {% render_table weekly_table 'django_tables2/bootstrap.html' %}
+                            {% bootstrap_pagination  parameter_name='page_weekly' page=weekly_table.page pages_to_show=5 size='small' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg bg-info">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="col-12 mt-2">
+                            <label style="font-size:30px;color:#235597;margin:0;line-height:30px;">Instruction Information</label>
+                            <table class="table table-bordered mt-3">
+                                <tbody>
+                                    <tr class="text-center block-blue">
+                                        <th colspan='2'><h5><i class="fas fa-info-circle"></i>&nbsp;&nbsp;<strong>Patient Information</strong></h5></th>
+                                    </tr>
+                                    <tr>
+                                        <th width="30%">Name: </th>
+                                        <td id="patient_name"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date of Birth: </th>
+                                        <td id="patient_dob"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Address: </th>
+                                        <td id="patient_address"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>NHS #: </th>
+                                        <td id="patient_nhs"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Mediref: </th>
+                                        <td id="medi_ref"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Client reference: </th>
+                                        <td id="client_ref"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table table-bordered mt-3">
+                                <tbody>
+                                    <tr class="text-center block-blue">
+                                        <th colspan='2'><h5><strong>Requested Conditions</strong></h5></th>
+                                    </tr>
+                                    <tr>
+                                        <td id="detail_request"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table table-bordered mt-3">
+                                <tbody>
+                                    <tr class="text-center block-blue">
+                                        <th colspan='2'><h5><strong>Instruction start and completion date</strong></h5></th>
+                                    </tr>
+                                    <tr>
+                                        <th>Start date: </th>
+                                        <td id="detail_start_date"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Completed date: </th>
+                                        <td id="detail_complete_date"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Result: </th>
+                                        <td id="result_date"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <button class="btn btn-danger btn-block btn-lg" data-dismiss="modal"><i class="fas fa-times"></i>&nbsp;&nbsp;Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg bg-info">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="col-12 mt-3">
+                            <h1>Out of services !</h1>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <button class="btn btn-danger btn-block btn-lg" data-dismiss="modal"><i class="fas fa-times"></i>&nbsp;&nbsp;Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block Script %}
+    <script src="{% static 'js/dataTables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/dataTables/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'js/instructions/instruction_views.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#instructionsTable').DataTable();
+            $('#WeeklyInvoiceTable').DataTable();
+            $('.dataTables_filter, .dataTables_info, .dataTables_paginate, .dataTables_length').hide();
+            $('tr th a').removeAttr('href');
+            $('tr th a').addClass('text-dark');
+            $('.pager').hide();
+        });
+
+        $('.infoDetailButton').click(function () {
+            $('#detail_request').empty();
+            $('#patient_name').text($(this).data('patient_name'));
+            $('#patient_dob').text($(this).data('patient_dob'));
+            $('#patient_address').text($(this).data('patient_address'));
+            $('#patient_nhs').text($(this).data('patient_nhs'));
+            $('#client_ref').text($(this).data('patient_client_ref'));
+            $('#medi_ref').text($(this).data('patient_medi_ref'));
+            $('#detail_request').append('- ' + $(this).data('detail_request').replace(/\,/g, '<br>- '));
+            $('#detail_start_date').text($(this).data('detail_start_date'));
+            $('#detail_complete_date').text($(this).data('detail_complete_date'));
+            $('#result_date').text($(this).data('result_date'));
+            $('#infoModal').modal();
+        });
+
+        $('.invoiceDetailButton').click( function () {
+            $('#invoiceModal').modal();
+        });
+
+        $('.status_paid').each( function() {
+            if( $(this).text() == 'Paid' ) {
+                $(this).parent().removeClass('block_unpaid')
+                $(this).parent().addClass('block_paid');
+            }
+        });
+
+        var start = new Date(1900, 1, 1);
+        var end = new Date();
+
+        $('#id_from_date').datepicker({
+            clearBtn: true,
+            startDate : start,
+            endDate   : end,
+            autoclose : true,
+            format: 'mm/dd/yyyy',
+        }).on('changeDate', function(){
+            if($(this).val()){
+                $('#id_to_date').datepicker('setStartDate', new Date(reformatted_date($(this).val())));
+            }else {
+                $('#id_to_date').datepicker('setStartDate', start);
+            }
+        });
+
+        $('#id_to_date').datepicker({
+            clearBtn: true,
+            startDate : start,
+            endDate   : end,
+            autoclose : true,
+            format: 'mm/dd/yyyy',
+        }).on('changeDate', function(){
+            if($(this).val()){
+                $('#id_from_date').datepicker('setEndDate', new Date(reformatted_date($(this).val())));
+            }else {
+                $('#id_from_date').datepicker('setEndDate', end);
+            }
+        });
+
+        $('#libraryTable_page_length').val({{ page_length }});
+        $('#libraryTable_page_length').change(function () { 
+            if( getUrlParameter('status') ) {
+                window.location = '/accounts/view-account/?status=' + getUrlParameter('status') + "&page_length=" + $(this).val();
+            } else {
+                window.location = '/accounts/view-account/?page_length=' + $(this).val();
+            }
+        });
+    </script>
+    
+{% endblock %}

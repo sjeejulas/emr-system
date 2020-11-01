@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{% block ExtraHead %}
+    <link rel="stylesheet" href="{% static 'css/pretty-checkbox.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/management/new_user.css' %}">
+    <link rel="stylesheet" href="{% static 'css/intlTelInput.min.css' %}">
+{% endblock %}
+
+{% block Content %}
+    <form action="{% url 'accounts:create_user' %}" method="post" id="createuser">
+        {% csrf_token %}
+        {{ newuser_form.non_field_errors }}
+          
+        <div class="row">
+            <div class="col-md-3 labelText"><label>Title</label></div>
+            <div class="col-md-4 inputDiv">
+                {% bootstrap_field newuser_form.title %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 labelText"><label>First Name</label></div>
+            <div class="col-md-4 inputDiv">
+                {% bootstrap_field newuser_form.first_name %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 labelText"><label>Last Name</label></div>
+            <div class="col-md-4 inputDiv">
+                {% bootstrap_field newuser_form.last_name %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 labelText"><label>Email</label></div>
+            <div class="col-md-4 inputDiv">
+                {% bootstrap_field newuser_form.email show_help=True %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 labelText"><label>Mobile phone</label></div>
+            <div class="col-md-4 inputDiv">
+                {% bootstrap_field newuser_form.telephone_mobile show_label=false placeholder='' %}
+                {% bootstrap_field newuser_form.telephone_code %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 labelText"><label>Password</label></div>
+            <div class="col-md-4 inputDiv">
+                {% bootstrap_field newuser_form.password %}
+                <button id="passbtn" type="button" class="btn">Generate Password</button> 
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 labelText"><label>Send User Notification</label></div>
+            <div class="col-md-4 inputDiv">
+                <div class="sendemail">
+                    <div class="pretty p-default">
+                        {{ newuser_form.send_email }}
+                        <div class="state p-primary">
+                            <label>Send the new user an email about their account</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row bottom-line">
+            <div class="col-md-3 labelText"><label>Role</label></div>
+            <input type="hidden" id="user_role" name="user_role">
+            {% if user_type == "gp" %}
+            <div class="col-md-4 inputDiv rolebox">
+                <div class="checkbox rolechk">
+                    <div class="pretty p-default">
+                        <input type="checkbox" id="pm_role" value="0" class="gp_btn"/>
+                        <div class="state p-primary">
+                            <label>Manager</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox rolechk">
+                    <div class="pretty p-default">
+                        <input type="checkbox" id="gp_role" value="1" class="gp_btn"/>
+                        <div class="state p-primary">
+                            <label>GP</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox rolechk">
+                    <div class="pretty p-default">
+                        <input type="checkbox" id="sars_role" value="2" class="gp_btn"/>
+                        <div class="state p-primary">
+                            <label>Other Practice Staff</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if user_type == "client" %}
+            <div class="col-md-4 inputDiv rolebox">
+                <div class="checkbox rolechk">
+                    <div class="pretty p-default">
+                        <input type="checkbox" id="cadmin_role" value="0" class="client_btn"/>
+                        <div class="state p-primary">
+                            <label>Client Manager</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkbox rolechk">
+                    <div class="pretty p-default">
+                        <input type="checkbox" id="client_role" value="1" class="client_btn"/>
+                        <div class="state p-primary">
+                            <label>Client Administrator</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% if user_type == "gp" %}
+        <div class="paragraph bottom-line" style="display: none;">
+            <div class="row banktitle"><label>Bank Details</label></div>
+            <div class="row">
+                <div class="col-md-3 labelText"><label>Name of Bank</label></div>
+                <div class="col-md-4 inputDiv">
+                    {% bootstrap_field newuser_form.payment_bank_holder_name %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 labelText"><label>Account Number</label></div>
+                <div class="col-md-4 inputDiv">
+                    {% bootstrap_field newuser_form.payment_bank_account_number %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 labelText"><label>Sort Code</label></div>
+                <div class="col-md-4 inputDiv">
+                    <div class="row">
+                        {% bootstrap_field newuser_form.payment_bank_sort_code %}
+                        <div class="sortcode"><input id="sortcode1" type="text" class="form-control"></div>
+                        <p class="cusline">-</p>
+                        <div class="sortcode"><input id="sortcode2" type="text" class="form-control"></div>
+                        <p class="cusline">-</p>
+                        <div class="sortcode"><input id="sortcode3" type="text" class="form-control"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="paragraph">
+            <input id="submitbtn" type="submit" class="btn btn-primary" value="Add New User">
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/intlTelInput.min.js' %}"></script>
+    <script src="{% static 'js/intlTel.js' %}"></script>
+    <script>
+        $(document).ready(function(){
+            $("#passbtn").click(function(){
+                $("input[name=password]").val("medi2018");
+                alert("Password generated");
+            });
+            $(".gp_btn").change(function() {
+                var checked = $(this).is(':checked');
+                $(".gp_btn").prop('checked',false);
+                if(checked) {
+                    $(this).prop('checked',true);
+                    $("#user_role").val($(this).val());
+                }
+            });
+            $(".client_btn").change(function() {
+                var checked = $(this).is(':checked');
+                $(".client_btn").prop('checked',false);
+                if(checked) {
+                    $(this).prop('checked',true);
+                    $("#user_role").val($(this).val());
+                }
+            });
+            $("#createuser").on("submit", function(event) {
+                var sortcode = $("#sortcode1").val() + $("#sortcode2").val() + $("#sortcode3").val();
+                $("input[name=payment_bank_sort_code").val(sortcode);
+                $("#submitbtn").attr("disabled", "true");
+            });
+            setUpTel('id_telephone_mobile', 'id_telephone_code');
+        });
+    </script>
+{% endblock %}

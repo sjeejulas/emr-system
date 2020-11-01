@@ -1,0 +1,73 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: -ms-flexbox;
+    -ms-flex-align: center;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #f5f5f5;
+}
+
+.outer {
+    background-color: #0000000f;
+    display: table;
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.middle {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.inner {
+    background-color: white;
+    padding: 35px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 450px;
+    /*whatever width you want*/
+}
+
+.terms-policy {
+    display: flex;
+    justify-content: space-between;
+}
+
+.space-around {
+    justify-content: space-around;
+}
+
+.terms-policy button {
+    text-decoration: underline;
+    color: #0056b3;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.terms-policy p {
+    margin-bottom: 0;
+}
+
+.footer {
+    margin: 0 3rem;
+    margin-bottom: 2rem;
+}
+
+.modal-dialog {
+    max-width: 80%;
+    height: 90%;
+}
+
+.medi-logo {
+    background-color: black;
+    border: 10px solid black;
+    border-radius: 20px;
+}

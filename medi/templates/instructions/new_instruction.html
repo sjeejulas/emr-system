@@ -1,0 +1,884 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+
+{% block ExtraHead %}
+    <link href="{% static 'css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/bootstrap-datepicker.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/style.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'medicalreport/css/medicalreport.css' %}">
+    <link href="{% static 'css/instructions/new_instruction.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'assets/kartik-v-boostrap-fileinput/css/fileinput.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/kartik-v-boostrap-fileinput/themes/explorer-fas/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pretty-checkbox.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/intlTelInput.min.css' %}">
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/js/fileinput.js' %}"></script>
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/js/locales/LANG.js' %}"></script>
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/themes/fas/theme.js' %}"></script>
+{% endblock %}
+
+{% block Content %}
+    <form method="POST" enctype="multipart/form-data" id="newInstructionForm">
+        {% csrf_token %}
+        <div class="modal fade" id="form-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content sensitive-information-instructions alert-warning modal-warning-block">
+                    <h6>Confidentiality Policies:</h6>
+                    <ul>
+                        <li class="mt-2">
+                            If there is a Confidentiality Policy applied to this patient's clinical record within EMIS Web
+                            and you have the authority to override this, then please do this prior to processing the SAR.
+                        </li>
+                        <li class="mt-2">
+                            If you don’t have the authority within your practice, then pass this SAR to a clinician who
+                            will have the authorisation to override the confidentiality policy and then process the SAR.
+                        </li>
+                    </ul>
+                    <div class="inst_chk mt-3">
+                        <div class="pretty p-default right">
+                            <input type="checkbox" id="warningCheckbox">
+                            <div class="state p-primary">
+                                <label>I understand</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="instruction_id" name="instruction_id" value="{{ instruction_id }}" />
+        <div class="card-deck instruction">
+            {% if request.user.type == 'CLT' %}
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header"><h5>References</h5></div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-2">Your reference:</div>
+                                {% bootstrap_field reference_form.your_ref size='small' form_group_class='form-group col-md-4' show_label=False placeholder='' %}
+                                <div class="col-md-2">MediRef:</div>
+                                {% bootstrap_field reference_form.medi_ref size='small' form_group_class='form-group col-md-4' show_label=False %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="pr-0 {% if request.user.type == 'CLT' %} col-md-6 mt-4 {% else %} col-md-12 {% endif %}">
+                <div class="card mr-2">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Patient</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2 rowTitle">Name*:</div>
+                            {% bootstrap_field patient_form.patient_title size='small' form_group_class='form-group col-md-2 p-0' %}
+                            {% bootstrap_field patient_form.patient_first_name size='small' form_group_class='form-group col-md-4 px-2' placeholder='' %}
+                            {% bootstrap_field patient_form.patient_last_name size='small' form_group_class='form-group col-md-4 px-1' placeholder='' %}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2 rowTitle">Date of Birth*:</div>
+                            {% bootstrap_field patient_form.patient_dob_day size='small' show_label=True %}
+                            {% bootstrap_field patient_form.patient_dob_month size='small' show_label=True%}
+                            {% bootstrap_field patient_form.patient_dob_year size='small'  show_label=True %}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2 rowTitle">Address*:</div>
+                            {% bootstrap_field patient_form.patient_postcode size='small' form_group_class='form-group col-md-4 p-0 ' %}
+                            {% bootstrap_field patient_form.patient_address_number size='small' form_group_class='form-group col-md-6 px-1' %}
+                        </div>
+                        <div class="row" >
+                              {% bootstrap_field patient_form.patient_address_line1 size='small' form_group_class='form-group col-md-5 offset-md-2 p-0' placeholder='' %}
+                              {% bootstrap_field patient_form.patient_address_line2 size='small' form_group_class='form-group col-md-5' placeholder='' %}
+                              {% bootstrap_field patient_form.patient_address_line3 size='small' form_group_class='form-group col-md-5 offset-md-2 p-0' placeholder='' %}
+                              {% bootstrap_field patient_form.patient_city size='small' form_group_class='form-group col-md-5' placeholder='' %}
+                        </div>
+                        <div class="row" >
+                              {% bootstrap_field patient_form.patient_county size='small' form_group_class='form-group col-md-5 offset-md-2 p-0' placeholder='' %}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2 rowTitle">NHS #:</div>
+                            {% bootstrap_field patient_form.patient_nhs_number size='small' form_group_class='form-group col-md-4 p-0 mt-1' show_label=False placeholder='' %}
+                            {% comment %} {% if request.user.type == 'CLT' %}
+                                <div class="col-md-2 pl-4 rowTitle">Email:</div>
+                                {% bootstrap_field patient_form.patient_email size='small' form_group_class='form-group input-group col-md-4 px-1' show_label=False placeholder='' %}
+                            {% endif %} {% endcomment %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if request.user.type == 'CLT' %}
+                <div class="col-md-6 mt-4">
+                    <div class="card ">
+                        <div class="card-header"><h5>GP Practice</h5></div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 d-flex">GP Practice*:</div>
+                                <div class="col-md-6 p-0"><p id="nhsData"></p></div>
+                            </div>
+                            <div class="col-md-12">&nbsp;</div>
+                            <div class="row">
+                                <div class="col-md-3">Status GP Practice:</div>
+                                <strong><p id="statusGP"></p></strong>
+                            </div>
+                            <div class="col-md-12">&nbsp;</div>
+                            <div class="row">
+                                <div class="col-md-3 rowTitle">Search GP Practice:</div>
+                                {% bootstrap_field nhs_form.gp_practice size='small' form_group_class='form-group col-md-6 mb-1' show_label=False %}
+                                <input type="hidden" name="gp_practice_name" id="id_gp_practice_name" />
+                                <small class="col-md-9">
+                                    Search in this field using either: General Practice name, first line of address or surgery postcode. Select the correct Surgery from the drop down list provided.
+                                </small>
+                            </div>
+                            <div class="col-md-12">&nbsp;</div>
+                            <div class="row ">
+                                <div class="col-md-3 rowTitle">Named GP:</div>
+                                {% bootstrap_field gp_form.gp_title size='small' form_group_class='form-group col-md-2 p-0' %}
+                                {% bootstrap_field gp_form.initial size='small' form_group_class='form-group col-md-3 px-2' %}
+                                {% bootstrap_field gp_form.gp_last_name size='small' form_group_class='form-group col-md-4 px-2' %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 mt-4">
+                    <div class="card">
+                        <div class="card-header"><h5>Scope</h5></div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-2 d-flex">Type of Instruction*:</div>
+                                {% bootstrap_field scope_form.type size='small' form_group_class='form-group col-md-6 p-0' show_label=False %}
+                                <input type="hidden" id="type_catagory" name="type_catagory"> 
+                            </div>
+                            <div class="row d-none" id="template_form">
+                                <div class="col-md-2 rowTitle">Set from Template?</div>
+                                {% bootstrap_field scope_form.template size='small' form_group_class='form-group col-md-6 px-0' show_label=False %}
+                            </div>
+                            <div class="row" id="date_range">
+                                <div class="col-md-2 rowTitle">Medical reports date range</div>
+                                {% bootstrap_field scope_form.date_range_from size='small' form_group_class='form-group col-md-2 p-0 input-group dob' show_label=False %}
+                                {% bootstrap_field scope_form.date_range_to size='small'  form_group_class='form-group col-md-2 input-group dob' show_label=False %}
+                            </div>
+                            <div class="conditions d-none">
+                                <div class="row">
+                                    <div class="col-md-2 rowTitle" >Common Conditions of Interest*:</div>
+                                    {% bootstrap_field scope_form.common_condition size='small' form_group_class='form-group col-md-10 p-0 commonConditions' show_label=False %}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-2 rowTitle">Addition Conditions of Interest*:</div>
+                                    {% bootstrap_field scope_form.addition_condition size='small' form_group_class='form-group col-md-6 p-0' show_label=False %}
+                                    {{scope_form.addition_condition_title}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 mt-4" id="consent_main_block">
+                    <div class="card">
+                        <div class="card-header"><h5>Patient Consent</h5></div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-2 rowTitle">Upload consent form:</div>
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <div class="file-loading">
+                                            {% bootstrap_field scope_form.consent_form show_label=False %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 mt-4" id="patient_contact_main_block">
+                    <div class="card">
+                        <div class="card-header"><h5>Patient Contact</h5></div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row mt-4">
+                                        <div class="col-md-2 rowTitle">Email</div>
+                                        {% bootstrap_field patient_form.patient_email size='small' form_group_class='col-md-8' show_label=false placeholder='' %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row mt-4">
+                                        <div class="col-md-2 rowTitle">Confirm Email</div>
+                                        {% bootstrap_field patient_form.confirm_email size='small' form_group_class='col-md-8' show_label=false placeholder='' %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row mt-4">
+                                        <div class="col-md-2 rowTitle">Mobile Phone</div>
+                                        <div class="col-md-8">
+                                            {% bootstrap_field patient_form.patient_telephone_mobile size='small' show_label=false placeholder='' %}
+                                            {% bootstrap_field patient_form.patient_telephone_code %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 mt-4" id="questions_main_block">
+                    <div class="card">
+                        <div class="card-header"><h5>Addition Question</h5></div>
+                        <div class="card-body">
+                            <div class="row" id="questions_block">
+                                {{ addition_question_formset.management_form }}
+                                <table border="0" cellpadding="10" cellspacing="0" class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Questions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for form in addition_question_formset.forms %}
+                                        <tr>
+                                            <td>{{ form.question }}</td>
+                                            <td></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-md-12 mt-4">
+                    <div class="card">
+                        <div class="card-header"><h5>Scope</h5></div>
+                        <div class="card-body">
+                            <div class="row" id="date_range">
+                                <div class="col-md-3 rowTitle">Medical reports date range</div>
+                                {% bootstrap_field date_range_form.date_range_from size='small' form_group_class='form-group col-md-2 p-0 input-group dob' show_label=False %}
+                                {% bootstrap_field date_range_form.date_range_to size='small'  form_group_class='form-group col-md-2 input-group dob' show_label=False %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+            <div class="col-md-4 mt-4">
+                <button class="btn btn-primary btn-lg w-75" type="submit" id="submit-all">Submit</button>
+            </div>
+            {% if request.user.type == 'CLT' %}
+                <div class="col-md-4 mt-4">
+                    <button class="btn btn-primary btn-lg w-75" id="template_modal_btn" type="button" data-toggle="modal" disabled="true">Save as template</button>
+                </div>
+            {% endif %}
+    </form>
+
+    <div id="emailDialog1" class="emailModal well">
+        <h5><i class="fas fa-exclamation-triangle"></i>Warning</h5>
+        <p>That doesn't look like a valid email address</p>
+        <button class="emailDialog1_close rightBtn btn btn-sm btn-default">Close</button>
+    </div>
+    <div id="emailDialog2" class="emailModal well">
+        <h5><i class="fas fa-exclamation-triangle"></i>Warning</h5>
+        <p>Those email addresses don't match</p>
+        <button class="emailDialog2_close rightBtn btn btn-sm btn-default">Close</button>
+    </div>
+    <div id="confirmDialog" class="emailModal well">
+        <h5><i class="fas fa-exclamation-triangle"></i>Warning</h5>
+        <p>You must confirm email address</p>
+        <button class="confirmDialog_close rightBtn btn btn-sm btn-default">Close</button>
+    </div>
+    <div id="phoneDialog" class="emailModal well">
+        <h5><i class="fas fa-exclamation-triangle"></i>Warning</h5>
+        <p>Phone number invalid</p>
+        <button class="phoneDialog_close rightBtn btn btn-sm btn-default">Close</button>
+    </div>
+    <input type="button" id="modal_button" data-toggle="modal" data-target="#exampleModalCenter" style="display: none;">
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white text-center">
+                    <h5 class="modal-title mx-auto" id="exampleModalLongTitle">You must provide a copy of the patient's consent</h5>
+                </div>
+                <div class="modal-body bg-white" style="color: black; text-align: center;">
+                You must provide a copy of the patient's consent before you can proceed this instruction.
+                </div>
+                <div class="modal-footer bg-white">
+                    <button type="button" class="btn btn-secondary mx-auto" data-dismiss="modal">Go Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Template Modal -->
+    <div class="modal fade" id="create_template_modal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+               <div class="form-group">
+                   <label class="sr-only" for="template_title">Title</label>
+                   <input type="text" name="template_title" id="template_title" maxlength="255" class="form-control form-control-sm" placeholder="Title">
+               </div>
+              <div class="form-group">
+                  <div class="form-group">
+                      <label class="sr-only" for="template_description">Description</label>
+                      <textarea name="description" cols="40" rows="10" id="template_description" class="form-control form-control-sm" placeholder="Description"></textarea>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="save_template" class="btn btn-primary">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden tooltip -->
+    {% for template in templates %}
+        <p id="template_{{template.pk}}" class="tooltip">{{template.description}} <br>
+        ({% for concept in template.common_snomed_concepts.all %}
+            {% if forloop.counter != 1 %},{% endif %}{{ concept }}
+        {% endfor %})
+        </p>
+    {% endfor %}
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/jquery.popupoverlay.js' %}"></script>
+    <script src="{% static 'js/select2.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/intlTelInput.min.js' %}"></script>
+    <script src="{% static 'js/intlTel.js' %}"></script>
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+    <script src="{% static 'js/instructions/new_instruction.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            var isPopup = false;
+            var is_concent_uploaded = false;
+
+            setUpTel("id_patient_telephone_mobile", "id_patient_telephone_code");
+
+            {% if request.user.type == 'GP' %}
+                $("#form-modal").modal({
+                    backdrop: 'static'
+                });
+            {% endif %}
+
+            $('#submit-all').click( function(e) {
+                {% if request.user.type == 'CLT' %}
+                    if ($('#confirm_email').val() !='' && $('#confirm_email').val() != $('#id_patient_email').val() && !isPopup){
+                        isPopup = true;
+                        // If the validation fails then we show the custom error message
+                        setTimeout(function(){$("#emailDialog2").popup('show')}, 300);
+                    }
+                    else if($('#id_patient_email').val() !='' && $('#confirm_email').val() =='') {
+                        setTimeout(function(){$("#confirmDialog").popup('show')}, 300);
+                    }
+                    else if( $('#id_patient_telephone_mobile').val().length > 11 ) {
+                        setTimeout(function(){$("#phoneDialog").popup('show')}, 300);
+                    }
+                    else {
+                        if ( !is_concent_uploaded ) {
+                            e.preventDefault();
+                            $('#modal_button').click();
+                        }
+                    }
+
+                {% endif %}
+            });
+
+            // Check if file uploaded or not.
+            $('.file-loading').on('filecleared', function(event) {
+                is_concent_uploaded = false;
+            });
+
+            $('.file-loading').on('fileloaded', function(event, file, previewId, index, reader) {
+                is_concent_uploaded = true;
+            });
+
+            // Function for hidden field if choose SARS type.
+            $('input[name="type"]').on('change', function() {
+                var type = $(this).val();
+                if(type == 'AMRA'){
+                    $('#patient_contact_main_block').hide();
+                    $('#consent_main_block').show();
+                    $('#questions_main_block').show();
+                    $('#template_form').removeClass('d-none');
+                    $('#template_form').find('.select2-container--default').css('width', '100%');
+                }else{
+                    $('#patient_contact_main_block').show();
+                    $('#questions_main_block').hide();
+                    $('#template_form').addClass('d-none');
+                    $('.checkbox input[type="checkbox"]').prop("checked", false);
+                }
+            });
+
+            var template_data = null;
+            var patient_addr_num = '';
+            function reset_template_attrs(){
+                $('#questions_block').find('tbody').find('.dynamic-form').remove();
+            }
+            $('#gp_last_name').attr('name', 'gp_last_name');
+
+            $('#newInstructionForm tbody tr').formset({
+                'deleteText': 'X remove',
+                'addText': '+ Add Another',
+                'addCssClass': 'btn btn-primary',
+                'deleteCssClass': 'btn btn-danger'
+            });
+
+            $('#newInstructionForm').submit(function(){
+                let sel_add_conds = $('#id_addition_condition').val();
+                let titles = [];
+                if(sel_add_conds){
+                    for (let i = 0; i < sel_add_conds.length; i++) {
+                        titles.push($('#id_addition_condition option[value='+sel_add_conds[i]+']').text());
+                    }
+                }
+                $('#id_addition_condition_title').val(titles);
+            });
+
+            if((navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true )){
+                $("#id_consent_form").fileinput({
+                    theme: 'fas',
+                    showUpload: false,
+                    showPreview: false,
+                });
+            } else {
+                $("#id_consent_form").fileinput({
+                    theme: 'fas',
+                    showUpload: false
+                });
+            }
+
+            $('.radio').addClass('d-inline');
+            $('#id_common_condition').addClass('row px-2');
+            $('.checkbox').addClass('d-inline col-md-3');
+
+            $('.dob').append('<div class="input-group-prepend">\n' +
+                '    <div class="input-group-text">\n' +
+                '      <i class="fas fa-calendar-alt"></i>\n' +
+                '    </div>\n' +
+                '  </div>');
+
+            $('#id_patient_dob').datepicker({
+                format: 'dd/mm/yyyy',
+                orientation: 'bottom',
+                weekStart: 1,
+                daysOfWeekHighlighted: "6,0",
+                autoclose: true,
+                todayHighlight: true,
+            });
+
+            var start = new Date(1900, 1, 1);
+            var end = new Date();
+
+            $('#id_date_range_from').datepicker({
+                clearBtn: true,
+                startDate : start,
+                endDate   : end,
+                autoclose : true,
+                format: 'dd/mm/yyyy',
+            }).on('changeDate', function(){
+                if($(this).val()){
+                    $('#id_date_range_to').datepicker('setStartDate', new Date(reformatted_date($(this).val())));
+                }else {
+                    $('#id_date_range_to').datepicker('setStartDate', start);
+                }
+            });
+
+            $('#id_date_range_to').datepicker({
+                clearBtn: true,
+                startDate : start,
+                endDate   : end,
+                autoclose : true,
+                format: 'dd/mm/yyyy',
+            }).on('changeDate', function(){
+                if($(this).val()){
+                    $('#id_date_range_from').datepicker('setEndDate', new Date(reformatted_date($(this).val())));
+                }else {
+                    $('#id_date_range_from').datepicker('setEndDate', end);
+                }
+            });
+
+            $('.datepicker-days .table-condensed').css('width', '231px');
+
+            $('#id_gp_practice').select2({
+                ajax: {
+                    delay: 500,
+                    url: "{% url 'organisations:nhs_autocomplete' %}",
+                    data: function (params) {
+                        let query = {
+                            search: params.term,
+                        };
+                        return query;
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.items
+                        }
+                    }
+                }
+            });
+
+            $('#id_template').select2();
+            $('#id_template').on('select2:close', function() {
+                $('.tooltip').hide();
+            });
+
+            $(document).on('mouseenter', '#select2-id_template-results .select2-results__option', function(){
+                var optionID = $(this).attr('id');
+                if(optionID !== undefined){
+                    var templateID = optionID.split('-')[optionID.split("-").length-1];
+                    if ($(this).get(0).scrollWidth >= $(this).get(0).clientWidth) {
+                        var descriptionEL = $('#template_' + templateID);
+                        descriptionEL.show()
+                        descriptionEL.css({
+                           'left': ($(this).offset().left + $(this).outerWidth(true)) + 2,
+                           'top': parseFloat($(this).offset().top) + 5
+                        });
+                    }
+                }
+            }).on('mouseleave', '#select2-id_template-results .select2-results__option', function(e){
+                $('.tooltip').hide();
+            });
+            $('#id_template').on('change', function () {
+                $.ajax({
+                  url: "{% url 'template:get_template_data' template_id=0 %}".replace('0',$(this).val()),
+                    type: "GET",
+                    dataType: 'json',
+                    success: function (data) {
+                      $('#id_common_condition input[type=checkbox]').prop("checked", false);
+                      $('.dynamic-form').remove();
+                      $('#id_addition_condition option').remove();
+                      if(data.questions){
+                          $('#id_form-TOTAL_FORMS').val(data.questions.length);
+                          question_form_html = '';
+                          data.questions.forEach(function(question, index) {
+                              question_form_html += '<tr class="dynamic-form"> ' +
+                                  '<td> ' +
+                                    '<input type="text" value="' + question + '" name="form-'+ index + '-question" class="form-control questions_inputs" maxlength="255" id="id_form-'+ index + '-question"> ' +
+                                  '</td> ' +
+                                  '<td>' +
+                                    '<a class="btn btn-danger" href="javascript:void(0)">X remove</a>' +
+                                  '</td> ' +
+                                  '</tr>';
+                          });
+                          $('#questions_block').find('tbody').prepend(question_form_html);
+                      };
+                      if(data.snomed_concepts){
+                          data.snomed_concepts.forEach(function(snomed, index) {
+                            $("label:contains('" + snomed + "') input[type=checkbox]").prop( "checked", true );
+                          });
+                      };
+                      if(data.conditions){
+                          data.conditions.forEach(function(condition, index) {
+                              $('#id_addition_condition').append(new Option(condition["text"], condition["id"], true, true)).trigger('change');
+                          });
+                      };
+                    },
+                    error: function (errors) {
+                        create_alert('Unable to load a template.', 'error');
+                    }
+                })
+            });
+
+            $('#id_addition_condition').select2({
+                minimumInputLength: 3,
+                width: 500,
+                multiple: true,
+                ajax: {
+                    url: "{% url 'snomedct:query_snomed' %}",
+                    data: function (params) {
+                        let query = {
+                            keyword: params.term,
+                        };
+                        return query;
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        }
+                    }
+                }
+            });
+
+            if ("{{ selected_add_cond }}" != "") {
+                let add_cond = "{{ selected_add_cond|safe }}";
+                add_cond = JSON.parse(add_cond)
+                let add_cond_title = '{{ selected_add_cond_title|safe }}';
+                add_cond_title = JSON.parse(add_cond_title)
+                for (let i = 0; i < add_cond.length; i++) {
+                    let option = new Option(add_cond_title[i], add_cond[i], true, true);
+                    $('#id_addition_condition').append(option).trigger('change');    
+                }
+            }
+
+            
+            $('#id_patient_postcode').select2({
+                ajax: {
+                    url: function (params) {
+                        return "https://api.postcodes.io/postcodes/"+ params.term +"/autocomplete"
+                    },
+                    processResults: function (data) {
+                        let formed_data = [];
+                        for(let i=0; i < data['result'].length; i++){
+                            formed_data.push({'id': data['result'][i], 'text': data['result'][i]});
+                        }
+                        return {
+                            results: formed_data
+                        }
+                    }
+                }
+            });
+            $('#id_patient_postcode').prop('required', true);
+
+            var $selectAllButton = $('<button class="btn btn-default btn-xs" id="selectAllButton" type="button">Select All</button>');
+            var $deSelectAllButton = $('<button class="btn btn-default btn-xs" id="deSelectAllButton" type="button">Deselect All</button>');
+            $('#id_common_condition').append([$selectAllButton, $deSelectAllButton]);
+
+            $('#selectAllButton').on('click', function () {
+                $('.commonConditions input:checkbox').prop('checked', true);
+            });
+
+            $('#deSelectAllButton').on('click', function () {
+                $('.commonConditions input:checkbox').prop('checked', false);
+            });
+
+            $('#id_gp_practice').on('change', function () {
+                $('#statusGP').removeClass();
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'organisations:get_gporganisation_data' %}",
+                    data: {
+                        'code': $(this).val()
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#nhsData').text(data.address);
+                        $('#id_gp_practice_name').val(data.name);
+                        $('#statusGP').addClass(data.status_class);
+                        $('#statusGP').text(data.status);
+                    }
+                })
+            });
+
+            if ("{{selected_gp_code}}" != "") {
+                var option = new Option('{{selected_gp_code}}', '{{selected_gp_code}}', true, true);
+                $('#id_gp_practice').append(option);
+                $('#statusGP').addClass('{{ gp_status_class }}');
+                $('#statusGP').text('{{ gp_status }}');
+                $('#nhsData').text('{{ gp_address }}');
+            }
+
+
+             $('#id_patient_postcode').on('change', function () {
+                     var url = "{% url 'instructions:api_get_address' address='Address' %}".replace('Address', $(this).val());
+                     $.ajax({
+                        type: "GET",
+                        processData: false,
+                        url: url,
+                        success: function (data) {
+
+                            var addresses = data.addresses.map(function(item){
+                                return item.split(',');
+                            });
+                            data.formattedObj = {};
+                            var formattedData = data.addresses.map(function(item) {
+                                var name = item.split(',').filter(function (s) {
+                                    addresses.push(s);
+                                    return s != ' ';
+                                }).join(',');
+                                data.formattedObj[name] = item;
+                                return name;
+                            });
+
+                            $('#id_patient_address_number').empty();
+                            $('#id_patient_address_number').select2({
+                                data: formattedData
+                             });
+                            $('#id_patient_address_number').on('select2:select', function (e) {
+                                var selected = e.params.data;
+
+                                var selectedData;
+                                if(data.formattedObj[selected.text]) {
+                                    selectedData = data.formattedObj[selected.text].split(',');
+                                }else {
+                                    selectedData = selected.text.split(',');
+
+                                }
+
+                                $('#id_patient_address_line1').val(selectedData[0]);
+                                $('#id_patient_address_line2').val(selectedData[1]);
+                                $('#id_patient_address_line3').val(selectedData[2]);
+                                $('#id_patient_city').val(selectedData[5]);
+                                $('#id_patient_county').val(selectedData[6]);
+                            });
+
+                            if (patient_addr_num) {
+                                $('#id_patient_address_number').select2('val', [patient_addr_num]);
+                                patient_addr_num = '';
+                            } else {
+                                $('#id_patient_address_number').trigger({
+                                    type: 'select2:select',
+                                    params: {
+                                        data: {text: data.addresses[0]}
+                                    }
+                                });
+                            }
+
+                        }
+                })
+            });
+
+            if ('{{patient_form.instance.patient_postcode}}' != '') {
+                var option = new Option("{{patient_form.instance.patient_postcode}}", "{{patient_form.instance.patient_postcode}}", true, true);
+                $('#id_patient_postcode').append(option).trigger('change');
+            }
+
+            if ("{{selected_gp_adr_line1}}") {
+                $('#id_patient_address_line1').val("{{selected_gp_adr_line1}}");
+            }
+            if ("{{selected_gp_adr_line2}}") {
+                $('#id_patient_address_line2').val("{{selected_gp_adr_line2}}");
+            }
+            if ("{{selected_gp_adr_line3}}") {
+                $('#id_patient_address_line3').val("{{selected_gp_adr_line3}}");
+            }
+            if ("{{selected_gp_adr_county}}") {
+                $('#id_patient_county').val("{{selected_gp_adr_county}}");
+            }
+            if ("{{selected_pat_adr_num}}") {
+                patient_addr_num = "{{selected_pat_adr_num}}";
+            }
+
+            $('.instructionType').on('change', function () {
+               if($(this).is(':checked') && $(this).val() == 'AMRA'){
+                   $('#template_modal_btn').attr('disabled', false);
+                   $('.conditions').removeClass('d-none');
+               }else if($(this).is(':checked')){
+                   $('#template_modal_btn').attr('disabled', true);
+                   $('.conditions').addClass('d-none');
+               }
+            });
+
+            if('{{scope_form.type.value}}' != 'None') {
+                $('.instructionType').trigger('change').trigger('change');
+                if($('#id_template').val() != ""){
+                    $('#id_template').trigger('change');
+                }
+                $('input[name="type"]:checked').trigger('change');
+            }
+
+            $("#template_modal_btn").click(function(){
+                $("#create_template_modal").modal();
+            });
+
+            $('#save_template').on('click', function(){
+                if($('#template_title').val() == '') {
+                    $('#template_title').addClass('is-invalid');
+                    return false;
+                } else {
+                    $('#template_title').removeClass('is-invalid');
+                }
+                if($('#template_description').val() == '') {
+                    $('#template_description').addClass('is-invalid');
+                    return false;
+                } else {
+                    $('#template_description').removeClass('is-invalid');
+                }
+
+                if($('.instructionType:checked').val() != 'AMRA'){
+                    return false;
+                }
+
+                let questions = [];
+                $(".questions_inputs").each(function (i, el) {
+                     questions.push($(el).val());
+                });
+
+                let common_conditions = [];
+                $( "input[name='common_condition']:checked" ).each(function (i, el) {
+                     common_conditions.push($(el).val());
+                });
+
+                let addition_conditions = [];
+                $( "#id_addition_condition option:selected" ).each(function (i, el) {
+                     addition_conditions.push($(el).val());
+                });
+
+                let data = {
+                    'template_title': $('#template_title').val(),
+                    'description': $('#template_description').val(),
+                    'type': $('#id_type').val(),
+                    'questions': questions,
+                    'common_condition': common_conditions,
+                    'addition_condition': addition_conditions,
+                    'csrfmiddlewaretoken': '{{csrf_token}}'
+                };
+
+                $.ajax({
+                    url: "{% url 'template:create_template' %}",
+                    data: data,
+                    method: 'post',
+                    success: function (data) {
+                        if(data.error){
+                          create_alert(data.message, 'error');
+                        }else{
+                          create_alert(data.message, 'success');
+                        }
+                        $('#create_template_modal').modal('toggle');
+                    },
+                    error: function (errors) {
+                        errors = errors.responseJSON.errors;
+                        let msg = '';
+                        Object.keys(errors).forEach(function(key) {
+                            msg += errors[key].join();
+                        });
+
+                        create_alert('Template save failed. ' + msg, 'error');
+                    }
+                })
+            });
+        });
+        $("#warningCheckbox").click(function(){
+            if($(this).is(":checked")){
+                setTimeout(function(){
+                    $("#form-modal").modal('hide');
+                }, 600);
+            }
+        });
+
+        $('#id_date_range_from').keydown(function () {
+            return false;
+        });
+
+        $('#id_date_range_to').keydown(function () {
+            return false;
+        });
+
+        $('#type_0').click( function() {
+            $('#type_catagory').val(2);
+        });
+
+        $('#type_1').click( function() {
+            $('#type_catagory').val(1);
+        });
+
+        $('#type_2').click( function() {
+            $('#type_catagory').val(3);
+        });
+    </script>
+
+{% endblock %}

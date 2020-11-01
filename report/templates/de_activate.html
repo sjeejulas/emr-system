@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load medi_report_tags %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+
+{% block ExtraHead %}
+    <link href="{% static 'css/report/error_page.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block PageContent %}
+<div class="col-12">&nbsp;</div>
+<div class="container">
+    <div class=" col-12 mt-5 block-A">
+        <div class="block-detail">
+            <div class="col-12">
+                <div class=" text-center">
+                    <img class="col-5 medi-logo" src="{% static 'images/logo/eMR_med.png' %}">
+                </div>
+            </div>
+            <div class="col-12 mt-5 mb-5 text-center">
+                <h3>You can not access to medical report.</h3>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

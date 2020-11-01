@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load instruction_templatetags %}
+{% load get_permissions %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+     <!-- Jquery DataTables -->
+    <link rel="stylesheet" href="{% static 'css/dataTables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/instructions/pipeline_views_instructions.css' %}">
+{% endblock %}
+
+{% block Content %}
+    <div>
+        <div class="card">
+            <div class="card-body">
+                <div class="container-fluid">
+                    <div class="row" >
+                        <div class="col-md-8">
+                            {% if request.user.type == 'GP' %}
+                                {% if perms.instructions.create_sars %}
+                                    <a href="{% url 'instructions:new_instruction' %}" class="btn btn-fee text-light" id="addInstructionButton">New SARs Instruction</a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'instructions:new_instruction' %}" class="btn btn-fee" id="addInstructionButton">New Instruction</a>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <form id="topsearchform" role="search" method="get" action="" class="" autocomplete="off">
+                                {% comment %} {% csrf_token %} {% endcomment %}
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <input id="search" name="search" type="search" placeholder="{% if request.user.type == 'GP' %}Patient name{% else %}Patient name, Reference{% endif %}" class="form-control search" required="true">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-fee text-light btn-block" type="submit" id="id_search_btn"><i class="fas fa-search"></i>&nbsp;&nbsp;Search</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if user.type == 'GP' and table_fee and next_prev_data_fee %}
+            <div class="card mt-3" id="fee_block">
+                <div class="card-header text-light btn-fee">
+                    <div class="row">
+                        <div class="col-md-10 pt-2">
+                            <h5><i class="fas fa-exclamation-circle"></i>&nbsp;&nbsp;<strong>Priority - Fee Reduction Imminent (24hrs notice)</strong></h5>
+                        </div>
+                        <div class="col-md-2 pt-1">
+                            <select class="form-control" disabled>
+                                <option>AMRA</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% for k, v in count_fee_sensitive_number.items %}
+                                <div class="number">
+                                    {% comment %} <a href="#" onclick="instructionStatusFilter('{{ k }}');" class="ml-2 mr-2 mb-0">{{ k }} ({{ v }})</a> {% endcomment %}
+                                    <button class="btn btn-fee text-light" id="{{ k|cut:' ' }}_t2" onclick="instructionStatusFilter('{{ k }}', 'pipeline', 2);">{{ k }} ({{ v }})</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <!--
+                                <select class="form-control">
+                                    <option>Bulk Action</option>
+                                    <option>Tiny Action</option>
+                                </select>
+                            -->
+                        </div>
+                        <div class="col-md-3">
+                            <!--{% bootstrap_button 'Apply' button_type="button" button_class="btn-primary"%} -->
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="csrf">{% csrf_token %}</div>
+                            {% render_table table_fee 'django_tables2/bootstrap.html' %}
+                            {% bootstrap_pagination  parameter_name='page_t2' page=table_fee.page pages_to_show=5 size='small' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="card mt-4" id="all_block">
+            <div class="card-header text-light" style="background-color: #48b5a2">
+                <div class="row">
+                    <div class="col-md-10 pt-2">
+                        <h5><i class="fas fa-question-circle"></i>&nbsp;&nbsp;<strong>Pipeline</strong></h5>
+                    </div>
+                    <div class="col-md-2 pt-1">
+                        {% if search_pagination %}
+                            <select class="form-control" id="filterInstructionType" onchange="typeFilter('search');">
+                        {% else %}
+                            <select class="form-control" id="filterInstructionType" onchange="typeFilter('pipeline');">
+                        {% endif %}
+                            <option value="allType">All Types</option>
+                            <option value="AMRA">AMRA</option>
+                            <option value="SARS">SARS</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        {% for k, v in overall_instructions_number.items %}
+                            <div class="number" id="{{ k|cut:' ' }}">
+                                {% comment %} <a href="#" onclick="instructionStatusFilter('{{ k }}');" class="ml-2 mr-2 mb-0">{{ k }} ({{ v }})</a> {% endcomment %}
+                                {% if search_pagination %}
+                                    <button class="btn btn-info" id="{{ k|cut:' ' }}" onclick="instructionStatusFilter('{{ k }}', 'pipeline', 3);">{{ k }} ({{ v }})</button>
+                                {% else %}
+                                    <button class="btn btn-info" id="{{ k|cut:' ' }}" onclick="instructionStatusFilter('{{ k }}', 'pipeline', 1);">{{ k }} ({{ v }})</button>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <!--
+                            <select class="form-control">
+                                <option>Bulk Action</option>
+                                <option>Tiny Action</option>
+                            </select>
+                        -->
+                    </div>
+                    <div class="col-md-3">
+                        <!--{% bootstrap_button 'Apply' button_type="button" button_class="btn-primary"%} -->
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        {% render_table table_all 'django_tables2/bootstrap.html' %}
+                        {% if search_pagination %}
+                            {% bootstrap_pagination  extra='search='|add:search_input parameter_name='page_ts' page=table_all.page pages_to_show=5 size='small' %}
+                        {% else %}
+                            {% bootstrap_pagination  page=table_all.page pages_to_show=5 size='small' %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Block modal show when setup fee not complete -->
+    <div class="modal fade" id="check-fee-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="container pt-2">
+                    <div class='card'>
+                        <div class="card-body bg-primary text-light">
+                            <div class="text-center">
+                                <h4>Insurance medical reporting service has arrived!</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">&nbsp;</div>
+                    <p>
+                        In order to use eMR for ALL insurance and medical report requests within your eMR pipeline, <br>
+                        we need you to select your ‘Fee Band’ (you have already provided your Surgery bank account details) to receive payments. <br>
+                        You can click the button below or update through the ‘Fee Management’ menu option. <br>
+                        <br>
+                        You will still be able to process SARs at any time.
+                        <div class="col-12">&nbsp;</div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <button class="btn-block btn btn-secondary btn-lg" type="button" data-dismiss="modal">Dismiss</button>
+                            </div>
+                            <div class="col-md-5">&nbsp;</div>
+                            <div class="col-md-4">
+                                <a href="/accounts/view-account/"><button class="btn-block btn btn-primary btn-lg" type="button">Select Fee Band</button></a>
+                            </div>
+                        </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="check-bank-detail-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="container pt-2">
+                    <div class='card'>
+                        <div class="card-body bg-primary text-light">
+                            <div class="text-center">
+                                <h4>Insurance medical reporting service has arrived!</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">&nbsp;</div>
+                    <p>
+                        In order to use eMR for ALL insurance and medical report requests within your eMR pipeline, <br>
+                        we need you to provide your Surgery bank details (we already have your instructions regarding the ‘Fee Band’). <br>
+                        You can click the button below or update through the ‘Fee Management’ menu option. <br>
+                        <br>
+                        You will still be able to process SARs at any time. 
+                        <div class="col-12">&nbsp;</div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <button class="btn-block btn btn-secondary btn-lg" type="button" data-dismiss="modal">Dismiss</button>
+                            </div>
+                            <div class="col-md-5">&nbsp;</div>
+                            <div class="col-md-4">
+                                <a href="/accounts/view-account/"><button class="btn-block btn btn-primary btn-lg" type="button">Provide Bank Detail</button></a>
+                            </div>
+                        </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="check-all-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="container pt-2">
+                    <div class='card'>
+                        <div class="card-body bg-primary text-light">
+                            <div class="text-center">
+                                <h4>Insurance medical reporting service has arrived!</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">&nbsp;</div>
+                    <p>
+                        In order to use eMR for ALL insurance and medical report requests within your eMR pipeline, <br>
+                        we need you to select your ‘Fee Band’ and also to provide your Surgery bank details, so you can receive payments. <br>
+                        You can select a button below or update through the ‘Fee Management’ menu option. <br>
+                        <br>
+                        You will still be able to process SARs at any time. 
+                        <div class="col-12">&nbsp;</div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <button class="btn-block btn btn-secondary btn-lg" type="button" data-dismiss="modal">Dismiss</button>
+                            </div>
+                            <div class="col-md-1">&nbsp;</div>
+                            <div class="col-md-4">
+                                <a href="/accounts/view-account/"><button class="btn-block btn btn-primary btn-lg" type="button">Select Fee Band</button></a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="/accounts/view-account/"><button class="btn-block btn btn-primary btn-lg" type="button">Provide Bank Detail</button></a>
+                            </div>
+                        </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/dataTables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/dataTables/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'js/instructions/instruction_views.js' %}"></script>
+    <script src="{% static 'js/js.cookie.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#instructionsTable').DataTable();
+            $('#feeInstructionsTable').DataTable();
+            $('.dataTables_filter, .dataTables_info, .dataTables_paginate, .dataTables_length').hide();
+            $('th.gp_practice > a').text('GP Practice');
+            $('th.gp_practice > a').click(false);
+
+            $("<li class='page-item {{ next_prev_data_fee|keyvalue:'prev_disabled' }}'><a class='page-link'" +
+            "href='{% url 'instructions:view_pipeline' %}?page_t2={{ next_prev_data_fee|keyvalue:'prev_page' }}&status={{ next_prev_data_fee|keyvalue:'status' }}&type={{ next_prev_data_fee|keyvalue:'type' }}'>&lt;</a>/li").insertAfter('#fee_block .prev');
+            $("<li class='page-item {{ next_prev_data_fee|keyvalue:'next_disabled' }}'><a class='page-link'" +
+            "href='{% url 'instructions:view_pipeline' %}?page_t2={{ next_prev_data_fee|keyvalue:'next_page' }}&status={{ next_prev_data_fee|keyvalue:'status' }}&type={{ next_prev_data_fee|keyvalue:'type' }}'>&gt;</a></li>").insertBefore('#fee_block .last');
+
+            if( '{{ search_pagination }}' == 'search' ) {
+               $("<li class='page-item {{ next_prev_data_all|keyvalue:'prev_disabled' }}'><a class='page-link'" +
+                "href='{% url 'instructions:view_pipeline' %}?search={{search_input}}&page_ts={{ next_prev_data_all|keyvalue:'prev_page' }}&status={{ next_prev_data_all|keyvalue:'status' }}&type={{ next_prev_data_all|keyvalue:'type' }}'>&lt;</a>/li").insertAfter('#all_block .prev');
+                $("<li class='page-item {{ next_prev_data_all|keyvalue:'next_disabled' }}'><a class='page-link'" +
+                "href='{% url 'instructions:view_pipeline' %}?search={{search_input}}&page_ts={{ next_prev_data_all|keyvalue:'next_page' }}&status={{ next_prev_data_all|keyvalue:'status' }}&type={{ next_prev_data_all|keyvalue:'type' }}'>&gt;</a></li>").insertBefore('#all_block .last'); 
+
+                // Set default for text input
+                $('#search').val('{{search_input}}');
+            } else {
+                $("<li class='page-item {{ next_prev_data_all|keyvalue:'prev_disabled' }}'><a class='page-link'" +
+                "href='{% url 'instructions:view_pipeline' %}?page={{ next_prev_data_all|keyvalue:'prev_page' }}&status={{ next_prev_data_all|keyvalue:'status' }}&type={{ next_prev_data_all|keyvalue:'type' }}'>&lt;</a>/li").insertAfter('#all_block .prev');
+                $("<li class='page-item {{ next_prev_data_all|keyvalue:'next_disabled' }}'><a class='page-link'" +
+                "href='{% url 'instructions:view_pipeline' %}?page={{ next_prev_data_all|keyvalue:'next_page' }}&status={{ next_prev_data_all|keyvalue:'status' }}&type={{ next_prev_data_all|keyvalue:'type' }}'>&gt;</a></li>").insertBefore('#all_block .last');
+            }
+
+            $('.pager').hide();
+
+            cookieStatus = Cookies.get('status');
+            if( cookieStatus != -1 ){
+                status = cookieStatus;
+                var key = getObjectKeyByValue(inst_statusDict, status);
+                $('#' + key.replace(' ', '')).button('toggle')
+            } else {
+                if( getUrlParameter('status') ){
+                    status = getUrlParameter('status');
+                    var key = getObjectKeyByValue(inst_statusDict, status);
+                    $('#' + key.replace(' ', '')).button('toggle')
+                } else {
+                    $('#All').button('toggle')
+                }
+            }
+
+            $('.sel_gp_users').on('change', function(){
+                var instruction_id = $(this).closest('tr').data('id');
+                var selected_gp_id = $('option:selected', this).data('gp_id');
+                var csrf_element   = $(".csrf [name='csrfmiddlewaretoken']");
+
+                $.ajax({
+                    url : "{% url 'instructions:update_gp_allocated_user' %}",
+                    type: "POST",
+                    data : {
+                        csrfmiddlewaretoken: csrf_element[0].value,
+                        instruction_id: instruction_id,
+                        selected_gp_id: selected_gp_id
+                    }
+                })
+                .done(function(){
+                    create_alert('GP Allocated user is changed.', 'success');
+                })
+                .fail(function(){
+                    create_alert('Something went wrong, please try again.', 'error');
+                });
+            });
+
+            if(getUrlParameter('type')){
+                $('#filterInstructionType').val(getUrlParameter('type'));
+            }
+
+            $('.checkbox').each(function () {
+                $(this).html('<input type="checkbox">');
+            });
+
+            $("th input:checkbox").click(function(){
+                $('input:checkbox').not(this).prop('checked', this.checked);
+            });
+
+            $(".page-link").each(function () {
+                this.href = this.href + '&type=' + getUrlParameter('type') + '&status=' + getUrlParameter('status');
+            });
+
+            $('th a').click(function(e) {
+                e.preventDefault();
+            });
+
+            if({{check_fee_status}} == 1) {
+                $("#check-bank-detail-modal").modal({
+                    backdrop: 'static'
+                });
+            } else if({{check_fee_status}} == 2) {
+               $("#check-fee-modal").modal({
+                    backdrop: 'static'
+                }); 
+            } else if({{check_fee_status}} == 3) {
+               $("#check-all-modal").modal({
+                    backdrop: 'static'
+                }); 
+            }
+
+        });
+
+        function instructionStatusFilter(selected_status, page, tableNumber){
+            if(page == 'pipeline'){
+                if( tableNumber == 2 ) {
+                    window.location = '/instruction/view-pipeline/?status=' + inst_statusDict[selected_status] + '&type=' + $('#filterInstructionType').val() + '&table=2';
+                } else if( tableNumber == 3 ) {
+                    window.location = '/instruction/view-pipeline/?status=' + inst_statusDict[selected_status] + '&type=' + $('#filterInstructionType').val() + '&table=3&search={{search_input}}';
+                } else {
+                    window.location = '/instruction/view-pipeline/?status=' + inst_statusDict[selected_status] + '&type=' + $('#filterInstructionType').val();
+                }
+            } else if(page == 'payment'){
+                window.location = '/instruction/view-fee-payment-pipeline/?status=' + inst_statusDict[selected_status] + '&type=' + $('#filterInstructionType').val();
+            }
+        }
+
+        function typeFilter(page){
+            if(getUrlParameter('status')){
+                status = getUrlParameter('status');
+            }
+            if(page == 'pipeline'){
+                window.location = '/instruction/view-pipeline/?status=' + status + '&type=' + $('#filterInstructionType').val();
+            } else if( page == 'payment'){
+                window.location = '/instruction/view-fee-payment-pipeline/?status=' + status + '&type=' + $('#filterInstructionType').val();
+            } else if( page == 'search') {
+                window.location = '/instruction/view-pipeline/?status=' + status + '&type=' + $('#filterInstructionType').val() + '&table=3&search={{search_input}}';
+            }
+        }
+
+        $('#Rerun').append('<span id="rerun_comment">In order to complete this report, please refer to our troubleshooting guide section on attachments</span>');
+        $('#Rerun').on('mouseenter', function() {
+            $('#rerun_comment').show(300);
+        }).on('mouseleave', function() {
+            $('#rerun_comment').hide(300);
+        });
+    </script>
+{% endblock %}

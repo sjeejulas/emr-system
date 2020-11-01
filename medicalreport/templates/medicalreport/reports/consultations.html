@@ -1,0 +1,34 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+{% load final_report_tags %}
+<div style="display:flex;background-color:#235597;margin:0;">
+    <label class="header-medical-section">Consultations</label>
+</div>
+<div></div>
+{% if consultations or redaction.consultation_notes|default:"" %}
+    <table style="width:100%;font-size:15px;margin-top:10px;">
+        {% for model in consultations %}
+            {% with header=model|consultation_header:people dict_data=model|consultation_element_list label=model|consultaion_sick_note %}
+                <tr style="padding-top: 5px; font-size:20px;">
+                    <td>{{header}}</td>
+                </tr>
+                {% for item in dict_data %}
+                    {% for key, value in item.items %}
+                        {% with relations=relations|add_xpath:item %}
+                            {% if key != 'xpath' and key != 'map_code' %}
+                                <tr>
+                                    <td><label style="font-weight:bold;">{{key}}</label>: {{relations|replace_ref_phrases:value}}</td>
+                                </tr>
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                {% endfor %}
+            {% endwith %}
+        {% endfor %}
+        {% if redaction.consultation_notes|default:"" %}
+            <tr>
+                <td><label style="font-weight:bold;">Additional contextual information</label> : {{redaction.consultation_notes}}</td>
+            </tr>
+        {% endif %}
+    </table>
+{% endif %}

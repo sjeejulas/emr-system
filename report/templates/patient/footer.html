@@ -1,0 +1,73 @@
+{% load static %} 
+<div class="footer">
+    <div class="terms-policy mb-3 space-around">
+        {% if not request.COOKIES.verified_pin %}
+            {% if access_type == 'third-party' %}
+                <button id="MediTerms" type="button">Third Party Terms and Conditions</button>
+            {% else %}
+                <button id="MediTerms" type="button">Patient Terms and Conditions</button>
+            {% endif %}
+        {% endif %}
+        <p>&copy; MediData Exchange 2019 <button id="MediPolicy" type="button">Data Policy</button></p>
+    </div>
+</div>
+<div class="modal fade" id="MediTermsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="container">
+                    <div class="col-lg-12 col-md-12 col-sm-12 text-center">
+                        {% if access_type == 'third-party' %}
+                            {% if 'demo' in request.get_host %}
+                                <object data="{% static 'documents/ThirdPartyTerms[DEMO].pdf' %}#view=FitH" class="modal-dialog-pdf"></object>
+                            {% elif 'dev' in request.get_host %}
+                                <object data="{% static 'documents/ThirdPartyTerms[DEV].pdf' %}#view=FitH" class="modal-dialog-pdf"></object>
+                            {% else %}
+                                <object data="{% static 'documents/ThirdPartyTerms.pdf' %}#view=FitH" class="modal-dialog-pdf"></object>
+                            {% endif %}
+                        {% else %}
+                            {% if 'demo' in request.get_host %}
+                                <object data="{% static 'documents/MediTCs[DEMO].pdf' %}#view=FitH" class="modal-dialog-pdf"></object>
+                            {% elif 'dev' in request.get_host %}
+                                <object data="{% static 'documents/MediTCs[DEV].pdf' %}#view=FitH" class="modal-dialog-pdf"></object>
+                            {% else %}
+                                <object data="{% static 'documents/MediTCs.pdf' %}#view=FitH" class="modal-dialog-pdf"></object>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="MediPolicyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="container">
+                    <div class="col-lg-12 col-md-12 col-sm-12 text-center">
+                        <embed src="{% static 'documents/DataPolicy.pdf' %}#view=FitH" class="modal-dialog-pdf">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block Script %}
+  <script>
+      $(document).ready(function () {
+          $('#MediTerms').on('click', function(){
+              $('#MediTermsModal').modal("show");
+          });
+          $('#MediPolicy').on('click', function(){
+              $('#MediPolicyModal').modal("show");
+          });
+      });
+  </script>
+{% endblock %}

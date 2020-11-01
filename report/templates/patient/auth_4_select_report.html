@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load report_filters %}
+{% load bootstrap4 %}
+{% load get_permissions %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link href="{% static 'css/sign-in.css' %}" rel="stylesheet">
+    <link href="{% static 'css/report/patient_report.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block PageContent %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3 mt-3">
+            <img class=" mb-3 w-75 medi-logo" src="{% static 'images/logo/eMR_med.png' %}">
+        </div>
+        <div class="col-sm-12 report-messages" style="font-size: 18px">
+            {% if access_type == 'patient' %}
+                <p class="mb-0">Thank you for completing the security process - it is now safe for you to access your medical record </p>
+                <p class="mt-0">prepared by your GP Surgery.</p>
+            {% endif %}
+            <p class="mt-4 mb-5">You may access your medical record by selecting your preferred method:</p>
+
+            <form target="_blank" method="post">
+                {% csrf_token %}
+                <input type="submit" name='button' value="View Report" class="btn btn-accessCode ml-2 mr-2">
+                <input type="submit" name='button' value="Download Report" class="btn btn-downloadReport ml-2 mr-2">
+                <button type="button" class="btn btn-printReport ml-2 mr-2" id="printFinalReportButton">Print Report</button>
+            </form>
+
+            {% if access_type == 'patient' %}
+                <p class="mb-0 mt-4">We recommend that you select the ‘view record’ option, so you can initially view your record prior to</p>
+                <p>‘Authorising’ a 3<sup>rd</sup> party, such as your Solicitor having access.</p>
+
+                <p class="font-weight-bold mt-4">Authorising a 3<sup>rd</sup> Party</p>
+
+                <p class="mt-4 mb-0">This feature allows you to provide authorised secure access to a 3<sup>rd</sup> party you wish to have sight of your</p>
+                <p>medical record.</p>
+
+                <p class="mt-4 mb-0">Click ‘Authorise 3<sup>rd</sup> party access’ and complete the mandatory fields provided. Please note without this</p>
+                <p>important information, your authorised 3<sup>rd</sup> party will not be able to access this site.</p>
+
+                {% if access_type != 'third-party' %}
+                    <a href="{% url 'report:add-third-party' report_auth_id=report_auth.id %}" class="btn btn-authorisation ml-2 mr-2">Authorise Third Party</a>
+                {% endif %}
+
+                <p class="mt-4 mb-0">Your authorised 3<sup>rd</sup> party will be issued with their own unique access details and text code number sent to</p>
+                <p>their mobile phone, in order to obtain secure access.</p>
+
+                <p class="mt-4 mb-0">An authorised 3<sup>rd</sup> party will have up to 30 days from receipt of an email notification, to view or download</p>
+                <p class="mb-0">your medical record. This access will be de-activated on the 31st day. However you may extend</p>
+                <p>the authorisation by pressing the ‘Extend Authorisation’ button, and if the authorisation expires you will be able to ‘Re-authorise’ using the appropriate button. </p>
+
+                <p class="font-weight-bold mt-4">Authorising a 3<sup>rd</sup> Party</p>
+                <div class="col-md-12 pb-5">
+                    {% if third_parties.exists %}
+                        <table class="table">
+                            <tbody>
+                                {% for company in third_parties %}
+                                    <tr>
+                                        <th class="w-25 font-weight-normal">
+                                            {% if company.company %} {{ company.company }} {% else %} {{ company.contact_name }} {% endif %}
+                                        </th>
+                                        {% if company.expired_date|is_expired  %}
+                                            <th class="w-25 font-weight-normal">Expired</th>
+                                            <th class="w-25 font-weight-normal">
+                                                <a href="{% url 'report:renew-authorisation' third_party_authorisation_id=company.id%}"
+                                                   class="btn btn-authorisation w-75">Re-authorise</a>
+                                            </th>
+                                            <th class="w-25"></th>
+                                        {% else %}
+                                            <th class="w-25 font-weight-normal">Expires {{ company.expired_date|date:"d/m/Y" }}</th>
+                                            <th class="w-25 font-weight-normal">
+                                                <a href="{% url 'report:cancel-authorisation' third_party_authorisation_id=company.id%}"
+                                                   class="btn btn-cancelAuthorisation w-75">Cancel Authorisation</a>
+                                            </th>
+                                            <th class="w-25 font-weight-normal">
+                                                <a href="{% url 'report:extend-authorisation' third_party_authorisation_id=company.id%}"
+                                                   class="btn btn-authorisation w-75">Extend Authorisation</a>
+                                            </th>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="mb-0">You currently have no authorised third parties</p>
+                    {% endif %}
+                </div>
+            {% elif access_type == 'third-party' %}
+                <p class="mb-0 mt-4 font-weight-bold">Authorised as a 3<sup>rd</sup> Party</p>
+
+                <p class="mt-4 mb-0">As an authorised third party, you have access for up to 30 days from receipt of the first email notification</p>
+                <p>sent to you. However this can be extended by the owner of the medical record.</p>
+
+                <p class="mt-4 mb-0">Medidata Exchange Limited accept no liability whatsoever for misuse of the medical record that has</p>
+                <p>been authorised for sharing with you</p>
+            {% endif %}
+            <p class="mt-5 pt-3">For assistance please contact the Medidata Support Team at notifyus@medi2data.com</p>
+            <hr>
+            <h6 class="text-danger">
+                In accordance with GDPR, 
+                if you wish to withdraw your consent to Medidata holding your personal information, <br>
+                please email notifyus@medi2data.com and we will remove your information from our systems.
+            </h6>
+            <div class="col-12">&nbsp;</div>
+        </div>
+    </div>
+    {% include 'patient/footer.html' %}
+</div>
+{% endblock %}
+
+{% block Script %}
+    <script>
+        $('#printFinalReportButton').click(function(e) {
+            e.preventDefault();
+            var print_win = window.open("{% url 'medicalreport:view_total_report' instruction_id %}");
+            print_win.print();
+        });
+    </script>
+{% endblock %}

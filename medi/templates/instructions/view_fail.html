@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% load instruction_templatetags %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+
+{% block ExtraHead %}
+    <link href="{% static 'css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/bootstrap-datepicker.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/style.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/instructions/new_instruction.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'assets/kartik-v-boostrap-fileinput/css/fileinput.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/kartik-v-boostrap-fileinput/themes/explorer-fas/theme.css' %}">
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/js/fileinput.js' %}"></script>
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/js/locales/LANG.js' %}"></script>
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/themes/fas/theme.js' %}"></script>
+{% endblock %}
+
+{% block Content %}
+    <div class="alert alert-danger" role="alert">
+        <h5>Report or record failed to generate</h5>
+        <label>Sorry, something went wrong. You can see below a list of the attachments which failed to be 
+        incorporated into the report or record. You may attempt to regenerate the record, in case there was an issue with EMIS for example, 
+        or you may redact those specific attachments, or reject the instruction entirely.
+        </label>
+    </div>
+    
+    <div class="col-12">&nbsp;</div>
+    <div class='card'>
+        <div class="card-body">
+            <div class="container-fluid">
+                <h6><strong>a list of all the attachments that failed</strong></h6>
+                {% for detail_file in exception_merge.file_detail %}
+                    <li>{{ detail_file }}</li>
+                {% endfor %}
+            </div>
+        </div>
+    </div> 
+    
+    <div class="col-12">&nbsp;</div>
+    <div class="row">
+        <div class="col-4">
+            <form action="{% url 'instructions:view_fail' instruction.id %}" method="POST">
+                {% csrf_token %}
+                <input name="next_step" type="hidden" value="Retry"/>
+                <button class='btn btn-warning btn-lg btn-block text-dark' type="submit">
+                    <i class="fas fa-redo-alt"></i>&nbsp;&nbsp;Retry
+                </button>
+            </form>
+        </div>
+        <div class="col-4">
+            <form action="{% url 'instructions:view_fail' instruction.id %}" method="POST">
+                {% csrf_token %}
+                <input name="next_step" type="hidden" value="Edit"/>
+                <button class='btn btn-primary btn-lg btn-block text-white' type="submit">
+                    <i class="fas fa-edit"></i>&nbsp;&nbsp;Edit Record
+                </button>
+            </form>
+        </div>
+        <div class="col-4">
+            <button class='btn btn-danger btn-lg btn-block text-white' type="button" id="rejectFailBtn">
+                <i class="far fa-trash-alt"></i>&nbsp;&nbsp;Reject Instruction
+            </button>
+        </div>
+    </div>
+
+    
+
+    <div class="modal fade" id="modal-reject" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="container">
+                    <div class="modal-body mt-3">
+                        <h1><i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Warning</h1>
+                        <div class="col-12">&nbsp;</div>
+                        <div class="text-center">
+                            <h5>The status of this instruction will be 'rejected' and <br> it will have the following 'reject' reason applied:</h5><br>
+                            <h5>Reason:<strong>could not generate the report or record properly from EMIS</strong></h5>
+                            <div class="col-12">&nbsp;</div>
+                            <label class="text-danger">Please confirm for reject this instruction.</lable>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="col-12">
+                            <form action="{% url 'instructions:view_fail' instruction.id %}" method="POST">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input name="rejected_reason" type="hidden" value="{{ reject_reason_value }}"/>
+                                        <input name="next_step" type="hidden" value="Reject"/>
+                                        <button class="btn btn-lg btn-block btn-danger" type="submit">
+                                            <i class="fas fa-check"></i>&nbsp;&nbsp;Confirm Reject
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-secondary btn-lg btn-block" data-dismiss="modal">
+                                            <i class="fas fa-times"></i>&nbsp;&nbsp;Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block Script %}
+    <script>
+    $(document).ready(function () {
+        $('input').attr('readonly', true);
+
+        $("#id_consent_form").fileinput({
+            theme: 'fas',
+            showUpload: false,
+            {% if consent_form_data.path %}
+                initialPreview: [
+                    window.location.origin+'/{{ consent_form_data.path }}'
+                ],
+                initialPreviewAsData: true,
+                initialPreviewConfig: [
+                    {type: "{{ consent_form_data.type }}", url: "{% static consent_form_data.path %}" }
+                ]
+            {% endif %}
+        });
+
+        let total_addition_form = $('#id_form-TOTAL_FORMS').val() - 1;
+
+        $('#id_form-'+ total_addition_form.toString() +'-question').remove();
+
+        $('#rejectFailBtn').click( function () {
+            $("#modal-reject").modal({
+                backdrop: 'static'
+            });
+        });
+    });
+    </script>
+
+{% endblock %}

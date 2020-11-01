@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% load instruction_templatetags %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+
+{% block ExtraHead %}
+    <link href="{% static 'css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/bootstrap-datepicker.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/style.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'medicalreport/css/medicalreport.css' %}">
+    <link href="{% static 'css/instructions/new_instruction.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'assets/kartik-v-boostrap-fileinput/css/fileinput.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/kartik-v-boostrap-fileinput/themes/explorer-fas/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pretty-checkbox.min.css' %}">
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/js/fileinput.js' %}"></script>
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/js/locales/LANG.js' %}"></script>
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/themes/fas/theme.js' %}"></script>
+{% endblock %}
+
+{% block Content %}
+    <div class="modal fade" id="form-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content sensitive-information-instructions alert-warning">
+                <h6>Confidentiality Policies:</h6>
+                <ul>
+                    <li class="mt-2">
+                        If there is a Confidentiality Policy applied to this patient's clinical record within EMIS Web
+                        and you have the authority to override this, then please do this prior to processing the SAR.
+                    </li>
+                    <li class="mt-2">
+                        If you don’t have the authority within your practice, then pass this SAR to a clinician who
+                        will have the authorisation to override the confidentiality policy and then process the SAR.
+                    </li>
+                </ul>
+                <div class="inst_chk mt-3">
+                    <div class="pretty p-default right">
+                        <input type="checkbox" id="warningCheckbox">
+                        <div class="state p-primary">
+                            <label>I understand</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="alert alert-info" role="alert">
+        <h5>Instruction</h5>
+        <span>Allocated to <label class="text-bold">{{instruction.gp_user}}</label> at {{instruction.created|format_date}} <label class="reject-reason"></label></span>
+        <h5>Notes</h5>
+        {% if instruction.client_notes.exists %}
+            {% for note in instruction.client_notes.all %}
+                <p class="mb-0"><span>Noted by <label class="text-bold">{{note.created_by.get_full_name}}</label> at {{note.created_date|format_date}} for reason: {{note.note}}</span></p>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="card-deck instruction">
+        <div class="pr-0 col-md-6">
+            <div class="card mr-2">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Patient</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 rowTitle">Name*:</div>
+                        {% bootstrap_field patient_form.patient_title size='small' form_group_class='form-group col-md-2 p-0'%}
+                        {% bootstrap_field patient_form.patient_first_name size='small' form_group_class='form-group-plaintext  col-md-4 px-2' %}
+                        {% bootstrap_field patient_form.patient_last_name size='small' form_group_class='form-group col-md-4 px-1' %}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2 rowTitle">Date of Birth*:</div>
+                        {% bootstrap_field patient_form.patient_dob size='small' form_group_class='form-group col-md-6 p-0 input-group dob' show_label=False %}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2 rowTitle">Address*:</div>
+                        {% bootstrap_field patient_form.patient_postcode size='small' form_group_class='form-group col-md-4 p-0 ' %}
+                        {% bootstrap_field patient_form.patient_address_number size='small' form_group_class='form-group col-md-6 px-1' %}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2 rowTitle">NHS #:</div>
+                        {% bootstrap_field patient_form.patient_nhs_number size='small' form_group_class='form-group col-md-4 p-0 mt-1' show_label=False placeholder='' %}
+                        <div class="col-md-2 pl-4 rowTitle">Email:</div>
+                        {% bootstrap_field patient_form.patient_email size='small' form_group_class='form-group input-group col-md-4 px-1 emailField' show_label=False placeholder='' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 ">
+            <div class="card ">
+                <div class="card-header"><h5>GP Practice</h5></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 rowTitle">Search GP Practice:</div>
+                        {% bootstrap_field nhs_form.gp_practice size='small' form_group_class='form-group col-md-6 p-0' show_label=False %}
+                    </div>
+                    <div class="row " style="height: 130px">
+                        <div class="col-md-3 d-flex">GP Practice*:</div>
+                        <div class="col-md-6 p-0"><p id="nhsData">{{ nhs_address }}</p></div>
+                    </div>
+                    <div class="row ">
+                        <div class="col-md-3 rowTitle">Named GP:</div>
+                        {% bootstrap_field gp_form.gp_title size='small' form_group_class='form-group col-md-2 p-0' placeholder='' %}
+                        {% bootstrap_field gp_form.initial size='small' form_group_class='form-group col-md-3 px-2' %}
+                        {% bootstrap_field gp_form.gp_last_name size='small' form_group_class='form-group col-md-4 px-2' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 mt-4">
+            <div class="card">
+                <div class="card-header"><h5>Scope</h5></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 d-flex">Type of Instruction*:</div>
+                        {% bootstrap_field scope_form.type size='small' form_group_class='form-group col-md-6 p-0' show_label=False %}
+                    </div>
+                    <div class="conditions">
+                        <div class="row">
+                            <div class="col-md-2 rowTitle" >Conditions of Interest:</div>
+                            <ul class="pl-0">
+                                {% for condition in condition_of_interest %}
+                                    <li>{{ condition }}</li>
+                                {% endfor %}
+                            </ul>
+
+                        </div>
+                    </div>
+                    <div class="row" id="date_range">
+                        <div class="col-md-2 rowTitle">Medical reports date range</div>
+                        {% bootstrap_field date_range_form.date_range_from size='small' form_group_class='form-group col-md-2' show_label=False placeholder='' %}
+                        <p>To </p>
+                        {% bootstrap_field date_range_form.date_range_to size='small'  form_group_class='form-group col-md-2' show_label=False placeholder='' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 mt-4">
+            <div class="card">
+                <div class="card-header"><h5>References</h5></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">Your reference:</div>
+                        {% bootstrap_field reference_form.your_ref size='small' form_group_class='form-group col-md-4' show_label=False placeholder='' %}
+                        <div class="col-md-2">MediRef:</div>
+                        {% bootstrap_field reference_form.medi_ref size='small' form_group_class='form-group col-md-4' show_label=False %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if not instruction.type == 'SARS'%}
+            <div class="col-md-12 mt-4" id="consent_main_block">
+                <div class="card">
+                    <div class="card-header"><h5>Consent and Patient Copy</h5></div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2 rowTitle">Upload consent form:</div>
+                            <div class="col-md-10">
+                                <div class="form-group">
+                                    <div class="file-loading">
+                                        {% bootstrap_field scope_form.consent_form show_label=False %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 mt-4" id="questions_main_block">
+                <div class="card">
+                    <div class="card-header"><h5>Addition Question</h5></div>
+                    <div class="card-body">
+                        <div class="row" id="questions_block">
+                            {{ addition_question_formset.management_form }}
+                            <table border="0" cellpadding="10" cellspacing="0" class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Questions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for form in addition_question_formset.forms %}
+                                    <tr>
+                                        <td>{{ form.question }}</td>
+                                        <td></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    {% if request.user.type == 'GP' %}
+        <div class="row ml-1 mt-4 ">
+            <div class="col-md-6">
+                <a href="{% url 'instructions:view_pipeline' %}" class="btn btn-primary btn-lg" id="backButton"><i class="fas fa-chevron-left"></i > Go back</a>
+                {% if can_process %}
+                    <a href="{% url 'medicalreport:set_patient_emis_number' instruction_id=instruction_id %}"
+                    class="btn btn-primary btn-lg" id="confirmPatientButton">Confirm patient <i class="fas fa-chevron-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    {% if request.user.type == 'CLT'%}
+        <div class="row ml-1 mt-4 ">
+            <div class="col-md-6">&nbsp;</div>
+            <div class="col-md-3">
+                <form action="{% url 'instructions:new_instruction' %}" method="GET" class="mr-2">
+                    <input type="hidden" id="instruction_id" name="instruction_id" value="{{ instruction.id }}" />
+                    <button class="btn btn-primary btn-lg btn-block" id="editPatientBtn"><i class="fas fa-edit"></i>&nbsp;&nbsp;Edit Patient Details</button>
+                </form>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-danger btn-lg btn-block" id="cancelButton" type="button" data-toggle="modal" data-target="#cancelModal">
+                    <i class="far fa-trash-alt"></i>&nbsp;&nbsp;Cancel
+                </button>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Modal for confirm cancel -->
+    <div class="modal fade" id="cancelModal" role="dialog" aria-hidden="true" style="width:100%">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="container">
+                        <div class="col-12 mt-3">
+                            <h3><i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;Warning !</h3><br>
+                            <h5>Do you want to delete?</h5>
+                        </div>
+                        <div class="col-12">&nbsp;</div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button class="btn btn-secondary btn-block btn-lg" type="button" data-dismiss="modal">
+                                    <i class="fas fa-times"></i>&nbsp;&nbsp;No
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input name="rejected_reason" type="hidden" value="{{ reject_reason_value }}"/>
+                                    <button class="btn btn-danger btn-block btn-lg" type="submit">
+                                        <i class="fas fa-check"></i>&nbsp;&nbsp;Yes
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block Script %}
+    <script>
+        $(document).ready(function () {
+            {% if request.user.type == 'GP' %}
+                $("#form-modal").modal({
+                    backdrop: 'static'
+                });
+            {% endif %}
+
+            $('input').attr('readonly', true);
+            $("#id_consent_form").fileinput({
+                theme: 'fas',
+                showUpload: false,
+                {% if consent_form_data.path %}
+                    initialPreview: [
+                    window.location.origin+'{{ consent_form_data.path }}'
+                    ],
+                    initialPreviewAsData: true,
+                    initialPreviewConfig: [
+                        {type: "{{ consent_form_data.type }}", url: "{% static consent_form_data.path %}" }
+                    ]
+                {% endif %}
+            });
+
+            let total_addition_form = $('#id_form-TOTAL_FORMS').val() - 1;
+
+            $('#id_patient_address_number').attr("data-toggle", "tooltip");
+            $('#id_form-'+ total_addition_form.toString() +'-question').remove();
+            $('button[title="View Details"]').removeAttr('disabled');
+            $('#id_patient_address_number').tooltip({
+                title: $('#id_patient_address_number').val()
+            });
+            
+            $("#warningCheckbox").click(function(){
+                if($(this).is(":checked")){
+                    setTimeout(function(){
+                        $("#form-modal").modal('hide');
+                    }, 600);
+                }
+            });
+
+            $('#btn-zoom-embed').click( function() {
+                $('#embed-image').hide();
+            });
+        });
+        
+        function showEmbed() {
+            $('#embed-image').show();
+        }
+    </script>
+
+{% endblock %}

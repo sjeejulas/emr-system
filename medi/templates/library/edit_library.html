@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load instruction_templatetags %}
+{% load get_permissions %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+     <!-- Jquery DataTables -->
+    <link rel="stylesheet" href="{% static 'css/dataTables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/instructions/pipeline_views_instructions.css' %}">
+    <link href="{% static 'css/onboarding/emr_setup_final.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/library/library.css' %}">
+{% endblock %}
+
+{% block Content %}
+    <div>
+    {% csrf_token %}
+        <form method="POST" action="" id="addWordForm">
+            {% csrf_token %}
+            {% include 'library/add_word_modal.html' %}
+        </form>
+        <div class="modal fade" data-backdrop="static" tabindex="-1" role="dialog" id="warningModal">
+            <div class="vertical-alignment-helper">
+                <div class="modal-dialog vertical-align-center" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header custom-modal-header">
+                            <h3 class="col-12 modal-title text-center" id="warningHeader"></h3>
+                        </div>
+                        <div class="modal-body custom-modal-body">
+                            <p class="p-2 mt-2 pb-0 mb-0" id="warningMessage"></p>
+                        </div>
+                        <div class="modal-footer custom-modal-footer">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-secondary btn-lg library-button" data-dismiss="modal">Go back</button>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="#" class="btn btn-primary btn-lg library-button ml-5 text-light" id="continueDeleteButton">Continue</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" data-backdrop="static" tabindex="-1" role="dialog" id="deletedWordModal">
+            <div class="vertical-alignment-helper">
+                <div class="modal-dialog vertical-align-center" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header custom-modal-header">
+                            <h3 class="col-12 modal-title text-center">Delete word</h3>
+                        </div>
+                        <div class="modal-body custom-modal-body">
+                            <p class="p-2 mt-2 pb-0 mb-0 text-center">
+                                Word deleted and Library updated.
+                            </p>
+                        </div>
+                        <div class="modal-footer custom-modal-footer justify-content-center">
+                            <button type="button" class="btn btn-lg btn-fee text-light" data-dismiss="modal">Continue</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button class="btn btn-fee text-light btn-lg" id="AddWordButton">Add to Library</button>
+                        </div>
+                        <div class="offset-md-2 col-md-4">
+                            <form id="topsearchform" role="search" method="GET" action="" class="" autocomplete="off">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <input id="search" name="search" type="search" class="form-control search">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-fee text-light btn-block" type="submit" id="id_search_btn"><i class="fas fa-search"></i>&nbsp;&nbsp;Search</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="offset-md-9 col-md-3">
+                        <div class="Table_page_length">
+                            <label>Show per page</label>
+                            <select name="libraryTable_length" id="libraryTable_page_length" class="w-25 form-control-sm">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        {% render_table table 'django_tables2/bootstrap.html' %}
+                        {% bootstrap_pagination  page=table.page pages_to_show=5 size='small' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/dataTables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/dataTables/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'js/instructions/instruction_views.js' %}"></script>
+    <script src="{% static 'js/library/library.js' %}"></script>
+    <script>
+        $('#libraryTable').DataTable({
+            "pageLength": {{ page_length }},
+        });
+        $('.dataTables_filter, .dataTables_info, .dataTables_paginate, .pager, #libraryTable_length').remove();
+
+        if('{{ event }}' == 'delete') {
+            $('#deletedWordModal').modal({
+                backdrop: 'static'
+            });
+        }
+
+        if('{{ add_word_error_message }}') {
+            $('#headerModal').text('Add new word to the Surgery library');
+            $('#addWordModal').modal({
+                backdrop: 'static'
+            });
+        }else if('{{ edit_word_error_message }}') {
+            $('#headerModal').text('Edit word');
+            $('#addWordForm').attr('action', '{{ error_edit_link }}');
+            $('#addWordModal').modal({
+                backdrop: 'static'
+            });
+        }
+
+        $("<li class='page-item {{ next_prev_data|keyvalue:'prev_disabled' }}'><a class='page-link'" +
+            "href='{% url 'library:edit_library' event='index' %}?page={{ next_prev_data|keyvalue:'prev_page' }}'>&lt;</a>/li").insertAfter('.prev');
+        $("<li class='page-item {{ next_prev_data|keyvalue:'next_disabled' }}'><a class='page-link'" +
+            "href='{% url 'library:edit_library' event='index' %}?page={{ next_prev_data|keyvalue:'next_page' }}'>&gt;</a></li>").insertBefore('.last');
+
+        $(".page-link").each(function () {
+            this.href = this.href + '&page_length=' + {{ page_length }} + '&search=' + '{{ search_input }}';
+        });
+
+        $('#search').val('{{ search_input }}');
+
+        $('.editButton').click(function () {
+            clean_modal();
+            setup_edit_modal();
+            var value = $(this).parent().prev().text();
+            var key = $(this).parent().prev().prev().text();
+            if(value == '—'){
+                value = ''
+            }
+            $('#id_value').val(value);
+            $('#id_key').val(key);
+            $('#addWordForm').attr('action', $(this).data('editlink'));
+            $('#warningModal').modal({
+                backdrop: 'status',
+            });
+        });
+
+        $('.deleteButton').click(function () {
+            $('#warningHeader').text('Delete word');
+            $('#warningMessage').text('Are you sure you wish to delete this Library entry? This will not affect completed' +
+                ' reports/records but will affect any \'in progress\' or \'not started\' instructions, unless' +
+                ' redactions are already made.');
+            $('#continueDeleteButton').attr('href', $(this).data('deletelink'));
+            $('#continueDeleteButton').removeAttr('data-target data-toggle data-dismiss');
+        });
+
+        $('#AddWordButton').click(function () {
+            clean_modal();
+            setup_add_modal();
+            $('#addWordModal').modal({
+                backdrop: 'static',
+            });
+        });
+
+        $('#libraryTable_page_length').val({{ page_length }});
+        $('#libraryTable_page_length').change(function () {
+           window.location = "{% url 'library:edit_library' event='index' %}?page_length=" + $(this).val();
+        });
+    </script>
+{% endblock %}

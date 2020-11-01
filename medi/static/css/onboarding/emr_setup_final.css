@@ -1,0 +1,23 @@
+.emrSetupStage2 {
+    color: #333333;
+}
+
+.red{
+    color: #e80000;
+}
+
+#consentCheckBox {
+    margin-top: 7px;
+    width: 23px;
+    height: 23px;
+}
+
+.vertical-middle {
+    vertical-align: middle !important;
+}
+
+.mobile-phone-input{
+    padding-right: 0px !important;
+    padding-left: 35% !important;
+    margin-left: 0 !important;
+}

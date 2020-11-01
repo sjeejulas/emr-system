@@ -1,0 +1,60 @@
+<!-- Proceeding consent contact modal -->
+<div class="modal fade" data-backdrop="static" tabindex="-1" role="dialog" id="AsyncOptionModal">
+    <div class="vertical-alignment-helper">
+        <div class="modal-dialog vertical-align-center" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h4 class="col-12 modal-title text-center" id="headerModal">Processing can now take some time</h4>
+                </div>
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            The processing of your report or record is now taking place. 
+                            This can take some time depending on the size of the report or record, 
+                            and your internet speed.
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <label for="id_proceed_option_0">
+                                            Continue working on the report or record (please be aware that redactions in the attachments may still be taking place)
+                                        </label>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="radio" name="proceed_option" class="ml-3" value="0" id="id_proceed_option_0" checked>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <label for="id_proceed_option_0">
+                                            Return to the pipeline and be notified once redactions have taken place
+                                        </label>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="radio" name="proceed_option" class="ml-3" value="1" id="id_proceed_option_1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-secondary btn-lg btn-block" data-dismiss="modal">
+                            Go back
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-primary btn-lg btn-block" id="ProceedContinueButton">
+                            Continue
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

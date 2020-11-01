@@ -1,0 +1,32 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div class="container callout callout--no-padding">
+    <div class="row">
+        <div class="col">
+            <h6 class="callout__header">
+                Patient Profile
+                <span></span>
+            </h6>
+        </div>
+    </div>
+    <div class="table-bg">
+        <div class="table-scrollable">
+            <table class="value-event-table table-striped">
+                <tbody>
+                    {% for key, value in profile_events.items %}
+                        {% if key == 'cervical_smear_test' and not profile_sex == 'F' %}
+                            {% comment %} If Patient was Male this condition will skip create row cervical_smear_test on report {% endcomment %}
+                        {% else %}
+                            <tr class="value-event-table__cell-row">
+                                <th class="value-event-table__header">{{ key|profile_event_value_header }}</th>
+                                {% for event in value %}
+                                <td class="value-event-table__cell">{{ event|event_value_body|safe }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

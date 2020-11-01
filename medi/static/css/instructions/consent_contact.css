@@ -1,0 +1,126 @@
+.instruction .card-header {
+    background-color: #36569a;
+    color: whitesmoke
+}
+    
+.rowTitle {
+    display: flex;
+    align-items: center;
+}
+
+.addPatentButton {
+    width: 34px;
+}
+
+.upload-drop-zone {
+    height: 200px;
+    border-width: 2px;
+    margin-bottom: 20px;
+}
+
+.upload-drop-zone {
+    color: #ccc;
+    border-style: dashed;
+    border-color: #ccc;
+    line-height: 200px;
+    text-align: center
+}
+.upload-drop-zone.drop {
+    color: #222;
+    border-color: #222;
+}
+
+.text-bold {
+    font-weight: bold;
+    font-family: sans-serif;
+}
+    
+#downloadBtn {
+  white-space: normal;
+}
+
+.rightBtn {
+    float: right;
+}
+
+.well {
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    display:none;
+    margin:1em;
+    min-height: 20px;
+    padding: 19px;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: inset 0 1px 1px;
+    max-width: 44em;
+}
+
+.dropdown-menu.reject {
+    background-color: #bd2130;
+}
+
+.dropdown-item {
+    color: whitesmoke;
+}
+
+.modal-reject {
+    height:100%;
+    width: 100%;
+    position: fixed;
+    top:0;
+    left:0;
+    background-color: rgba(0,0,0,0.4);
+    z-index:1050;
+    display: none;
+}
+
+.modal-reject .modal-header,
+.modal-reject .modal-body {
+    padding-bottom:0;
+}
+
+.modal-reject .modal-footer {
+    padding: 10px 20px;
+}
+
+.modal-reject .modal-content {
+    color: #856404;
+    background-color: #fff3cd;
+}
+
+textarea {
+    min-height: 75px;
+    max-width: 100%;
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 2.4375rem;
+    margin: 0 0 1rem;
+    padding: 0.5rem;
+    border: 1px solid #cacaca;
+    border-radius: 0;
+    background-color: #fefefe;
+    box-shadow: inset 0 1px 2px rgba(10, 10, 10, 0.1);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: normal;
+    color: #0a0a0a;
+    transition: box-shadow 0.5s, border-color 0.25s ease-in-out;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+#printModal .modal-body {
+    height: 500px;
+}
+
+#printModal .modal-lg {
+    max-width: 90%;
+}
+
+#AsyncOptionModal {
+    font-size: large;
+}

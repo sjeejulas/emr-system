@@ -1,0 +1,41 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div class="container callout callout--no-padding">
+    <div class="row">
+        <div class="col">
+            <h6 class="callout__header">
+                Allergies
+                <span></span>
+            </h6>
+        </div>
+    </div>
+    <div class="row callout__content">
+        <div class="container">
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <a class="nav-item nav-link active" id="nav-allergies-tab" data-toggle="tab" href="#nav-allergies" role="tab" aria-controls="nav-allergies" aria-selected="true">Allergies</a>
+                    <a class="nav-item nav-link" id="nav-add-allergies-tab" data-toggle="tab" href="#nav-add-allergies" role="tab" aria-controls="nav-add-allergies" aria-selected="false">Add allergies</a>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-allergies" role="tabpanel" aria-labelledby="nav-allergies-tab">
+                    {% for model in all_allergies %}
+                    {% with header=model|general_header %}
+                        {% redaction_checkbox_with_body model redaction header word_library section='allergies' %}
+                    {% endwith %}
+                    {% endfor %}
+                    {% form_additional_allergies additional_allergies word_library %}
+                    <br>
+                    <button type="submit" class="btn btn-primary float-right update_report_btn">Update</button>
+                </div>
+                <div class="tab-pane fade" id="nav-add-allergies" role="tabpanel" aria-labelledby="nav-add-allergies-tab">
+                    {% form_new_additional_allergies %}
+                    <button type="submit"
+                            id="addAllergiesButton"
+                            class="btn btn-primary float-right"
+                            onclick="subMitMedicalReport('add-allergies')">Add Allergy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

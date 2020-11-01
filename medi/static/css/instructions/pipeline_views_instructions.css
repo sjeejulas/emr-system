@@ -1,0 +1,57 @@
+/***************** 5. Instructions Pipeline ****************/
+.status .badge {
+  width: 128px;
+}
+
+.feeNote .badge {
+  width: 128px;
+  background-color: #00bba3;
+}
+
+#addInstructionButton {
+  color: white;
+  font-weight: bold;
+}
+
+.btn-info {
+  background-color: #48b5a2;
+}
+
+.btn-fee {
+  background-color: #296799;
+}
+
+.block-gray {
+  background-color: rgba(0 , 0, 0, 0.3);
+}
+
+.block-gray .warning_icon {
+  font-size: 72px;
+}
+
+.block_paid {
+  background-color: rgba(0 , 170, 0, 0.1);
+  color: black;
+}
+
+.block_unpaid { 
+  background-color: rgba(255 , 0, 0, 0.1);
+  color: black;
+}
+
+#Rerun {
+  position: relative;
+}
+
+#rerun_comment {
+  display: none;
+  position: absolute;
+  width: 322px;
+  height: 48px;
+  top: 50px;
+  left: -200px;
+  text-align: center;
+  border: 2px solid;
+  background: #e7e6e6;
+  z-index: 100;
+}

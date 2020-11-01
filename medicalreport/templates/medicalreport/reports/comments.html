@@ -1,0 +1,13 @@
+{% load custom_filters %}
+{% load final_report_tags %}
+<div style="display:flex;background-color:#235597;">
+    <label class="header-medical-section">Additional comments</label>
+</div>
+<div></div>
+{% if comment_notes|default:"" %}
+    <table style="width:100%;font-size:15px;margin-top:10px;">
+        <tr>
+          <td>{{ comment_notes }}</td>
+        </tr>
+    </table>
+{% endif %}

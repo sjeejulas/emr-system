@@ -1,0 +1,233 @@
+{% load static %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link rel="stylesheet" href="{% static 'medicalreport/css/medicalreport.css' %}">
+    <link rel="stylesheet" href="{% static 'css/intlTelInput.min.css' %}">
+{% endblock %}
+
+{% block Content %}
+  <div class="modal fade scroll" id="sharing-options" tabindex="-1" role="dialog" aria-hidden="true">
+    <form method="POST" enctype="multipart/form-data" id="sharing-options-form">
+      {% csrf_token %}
+      <div class="modal-dialog modal-dialog-centered modal-dialog-full" role="document">
+          <div class="modal-content">
+              <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title">Ways to share the report</h5>
+              </div>
+              <div class="modal-body modal-bg">
+                  <div class="card mb-2">
+                      <div class="card-body">
+                          <p class="card-text">There are different ways to return the record to your patient / third party. You can select multiple options.</p>
+                      </div>
+                  </div>
+                  <div class="card mb-2">
+                      <div class="card-body">
+                          <div class="card-title">1. Direct to the patient</div>
+                          <div class="panel-group driving-license-settings" id="accordion">                                                                                   
+                              <div class="panel panel-default">
+                                  <div class="panel-heading">
+                                      <h4 class="panel-title"> </h4>
+                                      <div class="checkbox col-md-12" id="confirmed-agreement">                                                                               
+                                          <label data-target="#collapse-to-patient" class="collapse-check">                                                                   
+                                              <input type="checkbox" class="patient-check" name="send-to-patient" id="ch-confirmed-agreement"> Confirmed to patient that agreement exists with Medidata Exchange Limited
+                                          </label>
+                                      </div>
+                                  </div>
+                                  <div id="collapse-to-patient" class="panel-collapse collapse in">                                                                           
+                                      <div class="panel-body">
+                                          <div class="driving-license-kind">
+                                              <div class="row">
+                                                  <div class="col-6 d-flex justify-content-center align-items-center text-center patient-content">                            
+                                                      <div class="alert alert-dark alert-dismissible fade show">                                                              
+                                                          <strong>Warning:</strong> It is the Surgery's responsibility to ensure that all consent forms are signed correctly by the patient and the Surgery, where appropriate.
+                                                      </div>
+                                                  </div>
+                                                  <div class="col-6 d-flex justify-content-center align-items-center patient-content">                                        
+                                                      <div class="col-12">
+                                                          <div class="col-12 text-center">                                                                                    
+                                                              <h6><strong>Contact information</strong></h6>                                                                   
+                                                          </div>
+                                                          <div class="row mt-4">
+                                                              <div class="col-md-4 rowTitle">Email<span class="text-danger asterisk">*</span></div>                           
+                                                              {% bootstrap_field patient_form.patient_email size='small' form_group_class='col-md-8' show_label=false placeholder='' %}
+                                                          </div>
+                                                          <div class="row mt-4">
+                                                              <div class="col-md-4 rowTitle">Confirm Email<span class="text-danger asterisk">*</span></div>
+                                                              {% bootstrap_field patient_form.confirm_email size='small' form_group_class='col-md-8' show_label=false placeholder='' %}
+                                                          </div>
+                                                          <div class="row mt-4">
+                                                              <div class="col-md-4 rowTitle">Mobile Phone<span class="text-danger asterisk">*</span></div>
+                                                              <div class="col-md-8">
+                                                                  {% bootstrap_field patient_form.patient_telephone_mobile size='small' show_label=false placeholder='' %}
+                                                                  {% bootstrap_field patient_form.patient_telephone_code %}
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="card mb-2">
+                      <div class="card-body">
+                          <div class="card-title">2. Return to a third party</div>
+                          <div class="panel-group driving-license-settings" id="accordion">
+                              <div class="panel panel-default">
+                                  <div class="panel-heading">
+                                      <h4 class="panel-title"> </h4>
+                                      <div class="checkbox col-md-6" id="report-third-party">
+                                          <label data-target="#third-party-section" class="collapse-check">
+                                              <input type="checkbox" name="send-to-third" id="ch-report-third-party"> Send report back to a third party
+                                          </label>
+                                      </div>
+                                  </div>
+                                  <div id="third-party-section" class="panel-collapse collapse in">
+                                      <div class="panel-body">
+                                          <div class="driving-license-kind">
+                                              <div class="row">
+                                                  <div class="col-md-12 mt-3">
+                                                      <div class="card">
+                                                          <div class="card-body">
+                                                              <div class="col-md-12">
+                                                                  <div class="row form-group text-center">
+                                                                      <div class="col-md-6">
+                                                                          <div class="row">
+                                                                              <div class="col-md-5 title-pos">Company <br>(if applicable)</div>
+                                                                              {% bootstrap_field third_party_form.company show_label=False form_group_class='col-md-7' placeholder='' %}
+                                                                          </div>
+                                                                      </div>
+                                                                      <div class="col-md-6">
+                                                                          <div class="row">
+                                                                              <div class="col-md-5 title-pos mt-2">Contact Name<span class="text-danger">*</span></div>
+                                                                              {% bootstrap_field third_party_form.contact_name show_label=False form_group_class='col-md-7' placeholder='' %}
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+                                                                  <div class="row form-group text-center">
+                                                                      <div class="col-md-6">
+                                                                          <div class="row">
+                                                                              <div class="col-md-5 title-pos">Case Reference <br>(if known) </div>
+                                                                              {% bootstrap_field third_party_form.case_reference show_label=False form_group_class='col-md-7' placeholder='' %}
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+                                                                  <div class="row form-group text-center">
+                                                                      <div class="col-md-6">
+                                                                          <div class="row">
+                                                                              <div class="col-md-5 title-pos mt-2">Email<span class="text-danger">*</span></div>
+                                                                              {% bootstrap_field third_party_form.email_1 show_label=False form_group_class='col-md-7' placeholder='' %}
+                                                                          </div>
+                                                                      </div>
+                                                                      <div class="col-md-6">
+                                                                          <div class="row">
+                                                                              <div class="col-md-5 title-pos mt-2">Confirm Email<span class="text-danger">*</span></div>
+                                                                              {% bootstrap_field third_party_form.email_2 show_label=False form_group_class='col-md-7' placeholder='' %}
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
+                                                              <div class="col-md-12">
+                                                                  <div class="row">
+                                                                      <div class="col-md-6">
+                                                                          <div class="row">
+                                                                              <div class="col-md-5 text-center">
+                                                                                  <p class="font-weight-bold mt-4 mb-4">Two factor authentication.</p>
+                                                                              </div>
+                                                                          </div>
+                                                                          <div class="row form-group">
+                                                                              <div class="col-md-5 text-center">
+                                                                                  <label for="id_office_phone_number" class="col-form-label">Office Phone (for solicitor for example)<span class="text-danger">*</span></label>
+                                                                              </div>
+                                                                              <div class="col-md-7">                                                                          
+                                                                                  {% bootstrap_field third_party_form.office_phone_number size='small' show_label=false placeholder='' %}
+                                                                                  {% bootstrap_field third_party_form.office_phone_number_code %}
+                                                                              </div>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <button type="button" class="btn btn-primary" data-dismiss="modal" id="s-cancel">Cancel</button>
+                  <button type="button" class="btn btn-success right" data-toggle="modal" data-target="#confirm-option">Update details</button>
+              </div>
+          </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal fade" id="confirm-option" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-body modal-shadow">
+                  <p class="card-text">Are you sure you wish to update the contact details? A notification will be sent to the recipient, advising they can access the medical record.</p>
+                  <button type="button" class="btn btn-primary" id="m-cancel">Cancel</button>
+                  <button type="button" class="btn btn-success right" id="m-confirm" data-dismiss="modal">Confirm</button>
+              </div>
+          </div>
+       </div>
+   </div>
+  <div class="modal fade" id="invalid-data" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-body modal-shadow">
+                  <p class="card-text">Incorrect data. Please check again.</p>
+                  <button type="button" class="btn btn-primary" id="m-cancel" data-dismiss="modal">Cancel</button>
+              </div>
+          </div>
+       </div>
+   </div>
+{% endblock %}
+{% block Script %}
+    <script src="{% static 'medicalreport/js/final_report.js' %}"></script>
+    <script src="{% static 'js/intlTelInput.min.js' %}"></script>
+    <script src="{% static 'js/intlTel.js' %}"></script>
+    <script>
+        var patientNotification = "{{ patient_notification }}";
+        var thirdPartyNotification = "{{ third_party_notification }}";
+
+        initialData(patientNotification, thirdPartyNotification);
+
+        setUpTel("id_patient_telephone_mobile", "id_patient_telephone_code");
+        setUpTel("id_office_phone_number", "id_office_phone_number_code");
+
+        $('#edit-option').on('click', function(e){
+          hidenReport();
+        });
+
+        $('#s-cancel').on('click', function(e){
+          showHidenReport();
+        });
+
+        $('#m-cancel').on('click', function(e){
+          $('.modal.show').modal('toggle');
+          $('.modal-backdrop').remove();
+          showHidenReport();
+        }); 
+
+        $('#m-confirm').on('click', function(e){
+          var is_allow = isValid();
+          if(is_allow === true){
+            $('#sharing-options-form').submit();
+          }else{
+            $('#invalid-data').modal('toggle');
+          }   
+        }); 
+    </script>
+{% endblock %}

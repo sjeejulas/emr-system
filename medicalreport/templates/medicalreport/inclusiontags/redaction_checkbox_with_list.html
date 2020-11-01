@@ -1,0 +1,46 @@
+{% load custom_filters %}
+<div>
+    <label class="redaction-checkbox">
+        {% for xpath in xpaths %}
+        <input name="redaction_xpaths" key="{{ xpath }}" data-redaction_xpaths = "{{ xpath }}" data-section="consultations"
+                {{ checked }} readonly="" type="checkbox" class="redaction-checkbox__input head-checkbox"
+                value="{{ xpath }}">
+        {% endfor %}
+        <span class="redaction-checkbox__icon float-right fas fa-check-circle"></span>
+        <span class="redaction-checkbox__header">{{ header }}</span>
+        <ul class="redaction-checkbox__text no-bullet redaction-checkbox__list">
+            {% for item in dict_data %}
+                <li class="redaction-checkbox__list-item">
+                {% for key, value in item.items %}
+                    <label class="redaction-checkbox">
+                        {% with relations=relations|add_xpath:item %}
+                            {% if key != 'xpath' and key != 'map_code'%}
+                                 <input name="redaction_xpaths"  key="{{ item|hash:'xpath'|first }}" data-section="consultations"
+                                     {% if item|hash:'xpath'|first in redaction_checks or item.map_code|first in sensitive_conditions %}
+                                     checked
+                                     {% endif %}
+                                     data-redaction_xpaths="{{item|hash:'xpath'|first }}" value="{{item|hash:'xpath'|first }}"
+                                     readonly type="checkbox" class="redaction-checkbox__input">
+                                <span class="redaction-checkbox__icon float-right fas fa-check-circle"></span>
+                                {% with text=relations|replace_ref_phrases:value %}
+                                    <span class="redaction-checkbox__text" title="{{ value }}"><strong>{{ key }}: </strong>{{ text }}</span>
+                                {% endwith %}
+                            {% endif %}
+                        {% endwith %}
+                    </label>
+                {% endfor %}
+                </li>
+            {% endfor %}
+            {% if label %}
+                <li>
+                    <h5><span class="badge badge-warning">{{ label }}</span></h5>
+                </li>
+            {% endif %}
+            {% if is_sensitive_consultation %}
+                <span class="badge badge-warning">Sensitive Condition</span>
+            {% endif %}
+        </ul>
+    </label>
+</div>
+
+

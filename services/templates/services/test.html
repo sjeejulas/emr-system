@@ -1,0 +1,455 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'services/css/test.css' %}">
+{% if patients %}
+<h1> Show patient list</h1>
+<table>
+    <thead>
+        <th>full_name</th>
+        <th>ref_id</th>
+        <th>nhs_number</th>
+        <th>sex</th>
+        <th>date_of_birth</th>
+        <th>parsed_date_of_birth</th>
+        <th>address_lines</th>
+    </thead>
+    {% for patient in patients %}
+    <tr>
+        <td>{{ patient.full_name }}</td>
+        <td>{{ patient.ref_id }}</td>
+        <td>{{ patient.nhs_number }}</td>
+        <td>{{ patient.sex }}</td>
+        <td>{{ patient.date_of_birth }}</td>
+        <td>{{ patient.parsed_date_of_birth }}</td>
+        <td>{{ patient.address_lines }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+{% if medical_record %}
+<h1>Medical record consultations</h1>
+<table>
+        <thead>
+            <th>date</th>
+            <th>original_author_refid</th>
+            <th>snomed_concepts</th>
+            <th>readcodes</th>
+            <th>is_significant_problem</th>
+            <th>is_profile_event</th>
+            <th>is_sick_note</th>
+            <th>consultation_elements</th>
+        </thead>
+{% for consultation in medical_record.consultations %}
+    <tr>
+        <td>{{ consultation.date }}</td>
+        <td>{{ consultation.original_author_refid }}</td>
+        <td>{{ consultation.snomed_concepts }}</td>
+        <td>{{ consultation.readcodes }}</td>
+        <td>{{ consultation.is_significant_problem }}</td>
+        <td>{{ consultation.is_profile_event }}</td>
+        <td>{{ consultation.is_sick_note }}</td>
+        <td>
+            <table style="width:100%">
+                <thead>
+                    <th>header</th>
+                    <th>display_order</th>
+                    <th>content</th>
+                    <th>content type</th>
+                    <th>is_significant_problem</th>
+                    <th>problem</th>
+                </thead>
+            {% for element in consultation.consultation_elements %}
+                <tr>
+                    <td>{{ element.header }}</td>
+                    <td>{{ element.display_order }}</td>
+                    <td>{{ element.content.description }}</td>
+                    <td>{{ element.content }}</td>
+                    <td>{{ element.is_significant_problem }}</td>
+                    <td>
+                        {% if element.problem %}
+                        <table style="width:100%">
+                            <thead>
+                                <th>guid</th>
+                                <th>is_active</th>
+                                <th>is_past</th>
+                                <th>is_significant</th>
+                                <th>date</th>
+                                <th>end_date</th>
+                                <th>parsed_end_date</th>
+                                <th>description</th>
+                            </thead>
+                            <tr>
+                                <td>{{ element.problem.guid }}</td>
+                                <td>{{ element.problem.is_active }}</td>
+                                <td>{{ element.problem.is_past }}</td>
+                                <td>{{ element.problem.is_significant }}</td>
+                                <td>{{ element.problem.date }}</td>
+                                <td>{{ element.problem.end_date }}</td>
+                                <td>{{ element.problem.parsed_end_date }}</td>
+                                <td>{{ element.problem.description }}</td>
+                            </tr>
+                        </table>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </table>
+        </td>
+    </tr>
+{% endfor %}
+</table>
+<h1>Medical record registration</h1>
+<table>
+    <thead>
+        <th>full_name</th>
+        <th>ref_id</th>
+        <th>nhs_number</th>
+        <th>sex</th>
+        <th>date_of_birth</th>
+        <th>parsed_date_of_birth</th>
+        <th>address_lines</th>
+    </thead>
+    <tr>
+        <td>{{ medical_record.registration.full_name }}</td>
+        <td>{{ medical_record.registration.ref_id }}</td>
+        <td>{{ medical_record.registration.nhs_number }}</td>
+        <td>{{ medical_record.registration.sex }}</td>
+        <td>{{ medical_record.registration.date_of_birth }}</td>
+        <td>{{ medical_record.registration.parsed_date_of_birth }}</td>
+        <td>{{ medical_record.registration.address_lines }}</td>
+    </tr>
+</table>
+<h1>Medical record acute_medications</h1>
+<table>
+    <thead>
+        <th>date</th>
+        <th>description</th>
+        <th>issue_count</th>
+        <th>parsed_issue_count</th>
+        <th>prescription_type</th>
+        <th>is_repeat</th>
+        <th>is_acute</th>
+        <th>snomed_concepts</th>
+        <th>readcodes</th>
+        <th>is_significant_problem</th>
+        <th>is_profile_event</th>
+        <th>xpaths</th>
+    </thead>
+    {% for element in medical_record.acute_medications %}
+    <tr>
+        <td>{{ element.date }}</td>
+        <td>{{ element.description }}</td>
+        <td>{{ element.issue_count }}</td>
+        <td>{{ element.parsed_issue_count }}</td>
+        <td>{{ element.prescription_type }}</td>
+        <td>{{ element.is_repeat }}</td>
+        <td>{{ element.is_acute }}</td>
+        <td>{{ element.snomed_concepts }}</td>
+        <td>{{ element.readcodes }}</td>
+        <td>{{ element.is_significant_problem }}</td>
+        <td>{{ element.is_profile_event }}</td>
+        <td>{{ element.xpaths }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record repeat_medications</h1>
+<table>
+    <thead>
+        <th>date</th>
+        <th>description</th>
+        <th>issue_count</th>
+        <th>parsed_issue_count</th>
+        <th>prescription_type</th>
+        <th>is_repeat</th>
+        <th>is_acute</th>
+        <th>snomed_concepts</th>
+        <th>readcodes</th>
+        <th>is_significant_problem</th>
+        <th>is_profile_event</th>
+        <th>xpaths</th>
+    </thead>
+    {% for element in medical_record.repeat_medications %}
+    <tr>
+        <td>{{ element.date }}</td>
+        <td>{{ element.description }}</td>
+        <td>{{ element.issue_count }}</td>
+        <td>{{ element.parsed_issue_count }}</td>
+        <td>{{ element.prescription_type }}</td>
+        <td>{{ element.is_repeat }}</td>
+        <td>{{ element.is_acute }}</td>
+        <td>{{ element.snomed_concepts }}</td>
+        <td>{{ element.readcodes }}</td>
+        <td>{{ element.is_significant_problem }}</td>
+        <td>{{ element.is_profile_event }}</td>
+        <td>{{ element.xpaths }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record referrals</h1>
+<table>
+    <thead>
+        <th>date</th>
+        <th>description</th>
+        <th>provider_refid</th>
+        <th>xpaths</th>
+    </thead>
+    {% for element in medical_record.referrals %}
+    <tr>
+        <td>{{ element.date }}</td>
+        <td>{{ element.description }}</td>
+        <td>{{ element.provider_refid }}</td>
+        <td>{{ element.xpaths }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record attachments</h1>
+<table>
+    <thead>
+        <th>date</th>
+        <th>description</th>
+        <th>dds_identifier</th>
+        <th>to_param</th>
+        <th>xpaths</th>
+    </thead>
+    {% for element in medical_record.attachments %}
+    <tr>
+        <td>{{ element.date }}</td>
+        <td>{{ element.description }}</td>
+        <td>{{ element.dds_identifier }}</td>
+        <td>{{ element.to_param }}</td>
+        <td>{{ element.xpaths }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record all_allergies</h1>
+<table>
+    <thead>
+        <th>date</th>
+        <th>description</th>
+        <th>xpaths</th>
+    </thead>
+    {% for element in medical_record.all_allergies %}
+    <tr>
+        <td>{{ element.date }}</td>
+        <td>{{ element.description }}</td>
+        <td>{{ element.xpaths }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record people</h1>
+<table>
+    <thead>
+        <th>full_name</th>
+        <th>category_description</th>
+        <th>name</th>
+        <th>ref_id</th>
+    </thead>
+    {% for element in medical_record.people %}
+    <tr>
+        <td>{{ element.full_name }}</td>
+        <td>{{ element.category_description }}</td>
+        <td>{{ element.name }}</td>
+        <td>{{ element.ref_id }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record locations</h1>
+<table>
+    <thead>
+        <th>address_lines</th>
+        <th>location_name</th>
+        <th>ref_id</th>
+    </thead>
+    {% for element in medical_record.locations %}
+    <tr>
+        <td>{{ element.address_lines }}</td>
+        <td>{{ element.location_name }}</td>
+        <td>{{ element.ref_id }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record problem_linked_lists</h1>
+<table>
+    <thead>
+        <th>target_guids</th>
+        <th>date</th>
+    </thead>
+    {% for element in medical_record.problem_linked_lists %}
+    <tr>
+        <td>{{ element.target_guids }}</td>
+        <td>{{ element.date }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record height</h1>
+<table>
+    <thead>
+        <th>description</th>
+        <th>date</th>
+        <th>has_bmi</th>
+        <th>has_weight</th>
+        <th>has_height</th>
+        <th>has_systolic_blood_pressure</th>
+        <th>has_diastolic_blood_pressure</th>
+    </thead>
+    {% for element in medical_record.height %}
+    <tr>
+        <td>{{ element.description }}</td>
+        <td>{{ element.date }}</td>
+        <td>{{ element.has_bmi }}</td>
+        <td>{{ element.has_weight }}</td>
+        <td>{{ element.has_height }}</td>
+        <td>{{ element.has_systolic_blood_pressure }}</td>
+        <td>{{ element.has_diastolic_blood_pressure }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record weight</h1>
+<table>
+    <thead>
+        <th>description</th>
+        <th>date</th>
+        <th>has_bmi</th>
+        <th>has_weight</th>
+        <th>has_height</th>
+        <th>has_systolic_blood_pressure</th>
+        <th>has_diastolic_blood_pressure</th>
+    </thead>
+    {% for element in medical_record.weight %}
+    <tr>
+        <td>{{ element.description }}</td>
+        <td>{{ element.date }}</td>
+        <td>{{ element.has_bmi }}</td>
+        <td>{{ element.has_weight }}</td>
+        <td>{{ element.has_height }}</td>
+        <td>{{ element.has_systolic_blood_pressure }}</td>
+        <td>{{ element.has_diastolic_blood_pressure }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record bmi</h1>
+<table>
+    <thead>
+        <th>description</th>
+        <th>date</th>
+        <th>has_bmi</th>
+        <th>has_weight</th>
+        <th>has_height</th>
+        <th>has_systolic_blood_pressure</th>
+        <th>has_diastolic_blood_pressure</th>
+    </thead>
+    {% for element in medical_record.bmi %}
+    <tr>
+        <td>{{ element.description }}</td>
+        <td>{{ element.date }}</td>
+        <td>{{ element.has_bmi }}</td>
+        <td>{{ element.has_weight }}</td>
+        <td>{{ element.has_height }}</td>
+        <td>{{ element.has_systolic_blood_pressure }}</td>
+        <td>{{ element.has_diastolic_blood_pressure }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record systolic_blood_pressure</h1>
+<table>
+    <thead>
+        <th>description</th>
+        <th>date</th>
+        <th>has_bmi</th>
+        <th>has_weight</th>
+        <th>has_height</th>
+        <th>has_systolic_blood_pressure</th>
+        <th>has_diastolic_blood_pressure</th>
+    </thead>
+    {% for element in medical_record.systolic_blood_pressure %}
+    <tr>
+        <td>{{ element.description }}</td>
+        <td>{{ element.date }}</td>
+        <td>{{ element.has_bmi }}</td>
+        <td>{{ element.has_weight }}</td>
+        <td>{{ element.has_height }}</td>
+        <td>{{ element.has_systolic_blood_pressure }}</td>
+        <td>{{ element.has_diastolic_blood_pressure }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record diastolic_blood_pressure</h1>
+<table>
+    <thead>
+        <th>description</th>
+        <th>date</th>
+        <th>has_bmi</th>
+        <th>has_weight</th>
+        <th>has_height</th>
+        <th>has_systolic_blood_pressure</th>
+        <th>has_diastolic_blood_pressure</th>
+    </thead>
+    {% for element in medical_record.diastolic_blood_pressure %}
+    <tr>
+        <td>{{ element.description }}</td>
+        <td>{{ element.date }}</td>
+        <td>{{ element.has_bmi }}</td>
+        <td>{{ element.has_weight }}</td>
+        <td>{{ element.has_height }}</td>
+        <td>{{ element.has_systolic_blood_pressure }}</td>
+        <td>{{ element.has_diastolic_blood_pressure }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record significant_active_problems</h1>
+<table>
+    <thead>
+        <th>guid</th>
+        <th>is_active</th>
+        <th>is_past</th>
+        <th>is_significant</th>
+        <th>date</th>
+        <th>end_date</th>
+        <th>parsed_end_date</th>
+        <th>description</th>
+        <th>xpaths</th>
+    </thead>
+    {% for element in medical_record.significant_active_problems %}
+    <tr>
+        <td>{{ element.guid }}</td>
+        <td>{{ element.is_active }}</td>
+        <td>{{ element.is_past }}</td>
+        <td>{{ element.is_significant }}</td>
+        <td>{{ element.date }}</td>
+        <td>{{ element.end_date }}</td>
+        <td>{{ element.parsed_end_date }}</td>
+        <td>{{ element.description }}</td>
+        <td>{{ element.xpaths }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h1>Medical record significant_past_problems</h1>
+<table>
+    <thead>
+        <th>guid</th>
+        <th>is_active</th>
+        <th>is_past</th>
+        <th>is_significant</th>
+        <th>date</th>
+        <th>end_date</th>
+        <th>parsed_end_date</th>
+        <th>description</th>
+        <th>xpaths</th>
+    </thead>
+    {% for element in medical_record.significant_past_problems %}
+    <tr>
+        <td>{{ element.guid }}</td>
+        <td>{{ element.is_active }}</td>
+        <td>{{ element.is_past }}</td>
+        <td>{{ element.is_significant }}</td>
+        <td>{{ element.date }}</td>
+        <td>{{ element.end_date }}</td>
+        <td>{{ element.parsed_end_date }}</td>
+        <td>{{ element.description }}</td>
+        <td>{{ element.xpaths }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<h1> XML </h1>
+<textarea style="margin: 0px;width: 100%; height: 400px;">{{xml_raw_data}}</textarea>

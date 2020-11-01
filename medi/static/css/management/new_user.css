@@ -1,0 +1,139 @@
+form {
+    margin: 0 30px;
+}
+
+.row {
+    padding-bottom: 20px;
+    margin: 0;
+}
+
+.labelText {
+    font-size: 17px;
+    padding: 0;
+    margin-top: 7px;
+}
+
+.notichk {
+    font-size:17px;
+}
+
+.top-line {
+    border-top: 1px solid #ccc;
+}
+
+.bottom-line {
+    border-bottom: 1px solid #ccc;
+}
+
+input[type="text"],
+input[type="email"] {
+    border-radius: 0;
+}
+
+.checkbox label:after, 
+.radio label:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.checkbox .cr,
+.radio .cr {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #a9a9a9;
+    border-radius: .25em;
+    width: 1.3em;
+    height: 1.3em;
+    float: left;
+    margin-right: .5em;
+}
+
+.radio .cr {
+    border-radius: 50%;
+}
+
+.checkbox .cr .cr-icon,
+.radio .cr .cr-icon {
+    position: absolute;
+    font-size: .8em;
+    line-height: 0;
+    top: 50%;
+    left: 20%;
+}
+
+.radio .cr .cr-icon {
+    margin-left: 0.04em;
+}
+
+.checkbox label {
+    padding: 0;
+}
+
+.checkbox label input[type="checkbox"],
+.radio label input[type="radio"] {
+    display: none;
+    padding: 0;
+}
+
+.checkbox label input[type="checkbox"] + .cr > .cr-icon,
+.radio label input[type="radio"] + .cr > .cr-icon {
+    transform: scale(3) rotateZ(-20deg);
+    opacity: 0;
+    transition: all .3s ease-in;
+}
+
+.checkbox label input[type="checkbox"]:checked + .cr > .cr-icon,
+.radio label input[type="radio"]:checked + .cr > .cr-icon {
+    transform: scale(1) rotateZ(0deg);
+    opacity: 1;
+}
+
+.checkbox label input[type="checkbox"]:disabled + .cr,
+.radio label input[type="radio"]:disabled + .cr {
+    opacity: .5;
+}
+
+.inputDiv {
+    padding: 0;
+}
+
+.sortcode {
+    width: 50px;
+    margin-right: 5px;
+}
+
+.cusline {
+    line-height: 2.5;
+    margin-right: 5px;
+}
+
+.rolebox {
+    border: 1px solid #ccc;
+}
+
+.rolechk {
+    margin: 15px;
+}
+
+.paragraph {
+    margin: 20px 0;
+    /* padding: 0 10px; */
+}
+
+.banktitle {
+    font-size: 20px;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
+
+.sendemail {
+    margin-top: 8px;
+}
+
+.disabled-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}

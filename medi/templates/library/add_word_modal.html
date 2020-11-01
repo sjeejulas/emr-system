@@ -1,0 +1,84 @@
+{% load bootstrap4 %}
+{% load static %}
+
+<div class="modal fade" data-backdrop="static" tabindex="-1" role="dialog" id="addWordModal">
+    <div class="vertical-alignment-helper">
+        <div class="modal-dialog vertical-align-center" role="document">
+            <div class="modal-content">
+                <div class="modal-header custom-modal-header">
+                    <h4 class="col-12 modal-title text-center" id="headerModal"></h4>
+                </div>
+                <div class="modal-body custom-modal-body">
+                    <div class="row subheader mt-4">
+
+                        <div class="col-md-5 pr-0">
+                            <p class="label-text" id="keyLabelInput">New word</p>
+                        </div>
+                        <div class="col-md-7 pl-0">
+                            {% bootstrap_field library_form.key show_label=False placeholder='' %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p class="mt-2 ml-4 text-secondary smaller-text">Adds a word to the  library. The library can be edited in the main pipeline view</p>
+                    </div>
+                    <div class="row subheader">
+                        <div class="col-md-5 pr-0">
+                            <p class="label-text">Replace with (optional)</p>
+                        </div>
+                        <div class="col-md-7 pl-0">
+                            {% bootstrap_field library_form.value show_label=False placeholder='' %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p class="mt-2 ml-4 text-secondary smaller-text">Replaces the word with an replacement. This is optional</p>
+                    </div>
+                    <div class="row">
+                        <div class="mt-2 ml-4 text-danger smaller-text" id="errorMessage">
+                        {% if add_word_error_message %}
+                            {{ add_word_error_message }}
+                        {% elif edit_word_error_message %}
+                            {{ edit_word_error_message }}
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer custom-modal-footer">
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-secondary btn-lg library-button" data-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-primary btn-lg library-button ml-5" id="saveWordButton">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="refreshModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg bg-info">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="container">
+                    <div class="col-12 pt-2">        
+                        <h4 id="titleRefreshModal" class="text-dark">Please wait</h4> 
+                        <div class="row border">
+                            <div class="col-3 bg-light text-center">
+                                <div class="container mt-4">
+                                    <img src="{% static 'images/custom_images/Magnify.gif'%}" class="img-fluid w-100">
+                                </div>
+                            </div>
+                            <div class="col-9 bg-dark">
+                                <div class="container mt-4">
+                                    <h5 id="check_1_icon"><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Adding word</h5>
+                                    <h5 id="check_2_icon"><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Find word</h5>
+                                    <h5 id="check_3_icon"><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Refreshing page</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

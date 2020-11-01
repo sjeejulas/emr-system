@@ -1,0 +1,146 @@
+{% load custom_filters %}
+{% load static %}
+<div class="col-md-12 mt-4 mb-2">
+    <div class="row">
+        <div class="col-md-6">
+            <h6><strong>{{ medical_record.registration.full_name }}</strong><span class="ml-4 color-grey ">({{ medical_record.registration_status.parsed_registration_status_date|format_date_filter}})</span></h6>
+            <ul class='no-bullet '>
+                <li><strong>Date of birth: </strong>{{ medical_record.registration.parsed_date_of_birth|format_date_filter }}</li>
+                <li><strong>Sex: </strong>{{ medical_record.registration.sex }}</li>
+                <li><strong>NHS number: </strong>{{ medical_record.registration.nhs_number }}</li>
+                <li><strong>Address: </strong>{{ medical_record.registration.address_lines|join:", " }}</li>
+                {% if medical_record.registration.re %}
+                    <li><strong>Address: </strong>{{ medical_record.registration.re|join:", " }}</li>
+                {% endif %}
+                {% if instruction.get_str_date_range %}
+                    <li><strong>Date Range: </strong>{{ instruction.get_str_date_range }}</li>
+                {% endif %}
+            </ul>
+        </div>
+        {% if instruction.type == 'AMRA' %}
+            <div class="col-md-6 ml-auto">
+                <h6><strong>{{ instruction.client.company_name }}</strong></h6>
+                <strong>Requested Conditions:</strong>
+                {% if not instruction.selected_snomed_concepts %}
+                    No conditions
+                {% else %}
+                <ul class=''>
+                    {% for snomed in instruction.selected_snomed_concepts %}
+                    <li>{{ snomed.fsn_description }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+        {% endif %}
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-right">
+            {% if instruction.client_user %}
+                {% if instruction.type == "SARS" %}
+                    <button class="btn btn-consent inline-block" data-toggle="modal" data-target="#sarsModal"><i class="fas fa-file-medical icon"></i> View SARs Request</button>
+                {% endif %}
+            {% else %}
+                <button class="btn btn-consent inline-block" data-toggle="modal" data-target="#consentModal"><i class="fas fa-file-medical icon"></i> View consent form</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="modal fade pdf-modal" id="sarsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">SARS Request</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; padding: 15px" class="file-preview-sars">
+                    {% if instruction.consent_form %}
+                        <object data="{{ instruction.consent_form.url }}" height="735px" width="60%">
+                        </object>
+                    {% elif instruction.sars_consent %}
+                        <object data="{{ instruction.sars_consent.url }}" height="735px" width="60%">
+                        </object>
+                    {% else %}
+                    <p>No consent form </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade pdf-modal" id="consentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Consents Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; padding: 15px" class="file-preview-consent">
+                    {% if instruction.type == 'SARS' and instruction.mdx_consent %}
+                        <object data="{{ instruction.mdx_consent.url }}" height="735px" width="60%">
+                        </object>
+                    {% elif instruction.type == 'AMRA' and instruction.consent_form %}
+                        <object data="{{ instruction.consent_form.url }}" height="735px" width="60%">
+                        </object>
+                    {% else %}
+                        <p>No consent form </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block Script %}
+    <script src="{% static 'js/instructions/consent_form.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            var file_url = '';
+
+            if ($('.file-preview-consent object').length) {
+                file_url = document
+                    .querySelector(
+                        'div.file-preview-consent object'
+                    ).data;
+            }
+            else if ($('.file-preview-sars object').length) {
+                file_url = document
+                    .querySelector(
+                        'div.file-preview-sars object'
+                    ).data;
+            }
+
+            var file_extension = file_url.split('.').pop();
+
+            if (file_extension.toLowerCase() == 'tiff') {
+                var xhr = new XMLHttpRequest();
+
+                xhr.responseType = 'arraybuffer';
+                xhr.open('GET', file_url);
+                xhr.onload = function (event) {
+                    var tiff = new Tiff({buffer: xhr.response});
+                    var canvas = tiff.toCanvas();
+
+                    canvas.setAttribute('style','width:60%; height:100%;');
+
+                    if ($('.file-preview-consent object').length &&
+                        !$('.file-preview-consent canvas').length) {
+                        document.querySelector('div.file-preview-consent object').remove();
+                        document.querySelector('div.file-preview-consent').append(canvas);
+                    }
+                    else if ($('.file-preview-sars object').length &&
+                            !$('.file-preview-sars canvas').length) {
+                        document.querySelector('div.file-preview-sars object').remove();
+                        document.querySelector('div.file-preview-sars').append(canvas);
+                    }
+                };
+                xhr.send();
+            }
+        });
+    </script>
+{% endblock %}

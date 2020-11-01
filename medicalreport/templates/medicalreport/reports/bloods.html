@@ -1,0 +1,32 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div style="display:flex;background-color:#235597;margin:0;">
+    <label class="header-medical-section">Bloods</label>
+</div>
+<div></div>
+{% if results %}
+    <table style="width:100%;font-size:15px;border: 1px solid black;margin-bottom:10px;margin-top:10px;">
+        {% for key, value in results.items %}
+            <tr>
+                <td style="font-weight:bold;padding:5px;">{{ key|bloods_type_value_header }}</td>
+                {% for event in value %}
+                    {% if forloop.counter|mod_column and forloop.counter != forloop.first %}
+                        </tr>
+                        <tr>
+                            <td/>
+                            <td style="padding:5px;">{{ event|event_value_body|safe }}</td>
+                    {% else %}
+                        <td style="padding:5px;">{{ event|event_value_body|safe }}</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+{% if redaction.bloods_notes|default:"" %}
+    <table style="width:100%;font-size:15px;margin-top:10px;">
+        <tr>
+            <td><label style="font-weight:bold;">Additional contextual information</label> : {{redaction.bloods_notes}}</td>
+        </tr>
+    </table>
+{% endif %}

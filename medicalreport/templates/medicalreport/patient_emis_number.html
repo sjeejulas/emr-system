@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load staticfiles %}
+{% load bootstrap4 %}
+{% load get_permissions %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link rel="stylesheet" href="{% static 'medicalreport/css/medicalreport.css' %}">
+    <link href="{% static 'css/bootstrap-datepicker.min.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block Content %}
+      <!-- Proceeding consent contact modal -->
+      {% include 'instructions/modal/proceed_consent_contact.html' %}
+      <div class="container-fluid">
+          <div class="card-deck">
+              <div class="card">
+                  <div class="card-header">
+                      <h4 class="text-bold">Patient Sought</h4>
+                  </div>
+                  <div class="card-body">
+                      <div class="patient-content">
+                          <div class="col-md-6">
+                              <div class="row">
+                                  <h4 class="text-bold">
+                                      {{instruction.patient_information.patient_first_name|default:"N/A"}} {{instruction.patient_information.patient_last_name|default:""}}
+                                  </h4>
+                              </div>
+                              <div class="row">
+                                  <h5 class="text-bold">Date of birth:&nbsp;</h5>
+                                  <h5>{{instruction.patient_information.patient_dob|format_date_filter|default:"N/A"}}</h5>
+                              </div>
+                              <div class="row">
+                                  <h5 class="text-bold">Address:&nbsp;</h5>
+                                  <h5>{{instruction.patient_information|instruction_patient_address|default:"N/A"}}</h5>
+                              </div>
+                              <div class="row">
+                                  <h5 class="text-bold">NHS number:&nbsp;</h5>
+                                  <h5>{{instruction.patient_information.patient_nhs_number|default:"N/A"}}</h5>
+                              </div>
+                          </div>
+                          {% if instruction.type == 'AMRA' %}
+                              <div class="col-md-6">
+                                  <div class="row">
+                                      <h4 class="text-bold">{{instruction.client_user.organisation.trading_name|default:"N/A"}}</h4>
+                                  </div>
+                                  <div class="row">
+                                      <div>
+                                          <h5 class="text-bold">Requested Conditions:</h5>
+                                          <ul>
+                                          {% if not instruction.selected_snomed_concepts %}
+                                              <li>No conditions</li>
+                                          {% else %}
+                                              {% for snomed in instruction.selected_snomed_concepts %}
+                                                  <li>{{ snomed.fsn_description }}</li>
+                                              {% endfor %}
+                                          {% endif %}
+                                          </ul>
+                                      </div>
+                                  </div>
+                              </div>
+                          {% endif %}
+                          {% if instruction.client_user %}
+                            <div class="patient-consent">
+                                <button class="btn btn-consent" data-toggle="modal" data-target="#pdfModal"><i class="fas fa-file-medical icon"></i> View consent form</button>
+                            </div>
+                          {% endif %}
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="card-deck mt-4">
+              <div class="card">
+                  <div class="card-header matching">
+                      <h4>Select a Matching Patient</h4>
+                  </div>
+                  <div class="card-body">
+                      {% for patient in patient_list %}
+                          <div class="row">
+                              <div class="col-md-2 text-bold">{{ patient.full_name }}</div>
+                              <div class="col-md-2">
+                                {{ patient.sex }}<br/>{{patient.nhs_number}}
+                              </div>
+                              <div class="col-md-2">{{ patient.date_of_birth }}</div>
+                              <div class="col-md-4">{{ patient|patient_address }}</div>
+                              <div class="col-md-2 select-btn">
+                                  <button data-instruction_id = "{{ instruction.id }}"
+                                          data-instruction_type = "{{ instruction.type }}"
+                                          data-client_info = "{{ instruction.client_user }}"
+                                          data-patient_ref_id = "{{ patient.ref_id }}"
+                                          data-viewline_url = "{% url 'instructions:view_pipeline' %}"
+                                          class = "btn btn-primary selectPatientButton">
+                                      Select
+                                  </button>
+                               </div>
+                          </div>
+                      {% endfor %}
+                  </div>
+                  <div class="card-footer">
+                      <label class="text-footer">Reject this request if there are no suitable matching patients:</label>
+                      <div class="row reject-btn mr-1">
+                          {% if instruction.type == 'SARS' and request.user.type == 'GP'%}
+                          <form action="{% url 'instructions:new_instruction' %}" method="GET" class="mr-2">
+                              <input type="hidden" id="instruction_id" name="instruction_id" value="{{ instruction.id }}" />
+                              <button class="btn btn-primary" id="editPatientBtn">Edit Patient Details</button>
+                          </form>
+                          {% endif %}
+                          {% if user.id|reject_instruction:instruction.id %}
+                              <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Reject Request
+                              </button>
+                          {% endif %}
+                          <div class="dropdown-menu dropdown-menu-right reject" aria-labelledby="dropdownMenuButton">
+                              {% for reject_type in reject_types %}
+                                {% if instruction.type == 'AMRA' %}
+                                    {% if reject_type.1 != 'Inappropriate consent / consent not properly obtained' %}
+                                        <div id="rejected_reason-{{reject_type.0}}" data-toggle="modal" data-target="#modal-reject" class="dropdown-item" onclick="updateRejectType(this);">
+                                            {{reject_type.1}}
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if instruction.type == 'SARS' %}
+                                    {% if reject_type.1 != 'The consent form is invalid' %}
+                                        <div id="rejected_reason-{{reject_type.0}}" data-toggle="modal" data-target="#modal-reject" class="dropdown-item" onclick="updateRejectType(this);">
+                                            {{reject_type.1}}
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                              {% endfor %}
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+    </div>
+    <div class="modal-reject" id="modal-reject">
+        <div class="modal-dialog modal-lg">
+            <form action="{% url 'medicalreport:reject_request' instruction.id %}" method="POST"  enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Reject note</h3>
+                    </div>
+                    <div class="modal-body">
+                        <textarea name="rejected_note"></textarea>
+                        <input name="rejected_reason" id="rejected_reason" type="hidden"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger reject-btn">Reject Request</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade pdf-modal" id="pdfModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Consents Form</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+
+               {% if instruction.consent_form%}
+                   <iframe src="{{ instruction.consent_form.url }}#zoom=100" height="735px" width="100%"></iframe>
+               {% else %}
+               <p>No consent form </p>
+               {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg bg-info">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="col-12 text-center mt-2">
+                            <img src="{% static 'images/custom_images/loading.gif'%}" class="img-fluid">
+                            <div class="col-12">&nbsp;</div>
+                            <h4>Patient : <strong>{{ patient_full_name }}</strong></h4>
+                            <h4 class="mt-2">The medical record or report will be generated soon.</h4>
+                            <label class="text-danger mt-4">Please don't leave this page. Process is running ....</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}
+{% block Script %}
+    <script src="{% static 'medicalreport/js/medicalreport.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            function proceed_action() {
+                $('#AsyncOptionModal').modal({
+                    backdrop: "static"
+                });
+            }
+
+            $('#ProceedContinueButton').on('click', function () {
+                if ($('#id_proceed_option_0').is(':checked')){
+                    $('#AsyncOptionModal').modal('hide');
+                    $('#loadingModal').modal({backdrop: "static"});
+                    navigate_action(false);
+                }
+                else if ($('#id_proceed_option_1').is(':checked')) {
+                    $('#AsyncOptionModal').modal('hide');
+                    window.location = $('.selectPatientButton').data('viewline_url');
+                }
+            });
+
+            function navigate_action(flag_modal) {
+                flag_modal = typeof flag_modal !== 'undefined' ? flag_modal : true;
+                var instruction_id = $('.selectPatientButton').data('instruction_id');
+                var instruction_type = $('.selectPatientButton').data('instruction_type');
+                var patient_ref_id = $('.selectPatientButton').data('patient_ref_id');
+                var action_url = "{% url 'medicalreport:select_patient' 1 2 %}";
+
+                if (instruction_type == "SARS" && flag_modal){
+                    action_url = "{% url 'instructions:consent_contact' 1 2 %}";
+                }
+
+                action_url = action_url
+                  .replace('1', '+=')
+                  .replace('2', '+*')
+                  .replace('+=', instruction_id)
+                  .replace('+*', patient_ref_id);
+                window.location = action_url;
+            }
+
+            $('.selectPatientButton').on('click', function () {
+                let client_info = $(this).data('client_info');
+
+                if (client_info != 'None') {
+                    proceed_action();
+                }
+                else {
+                    navigate_action();
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% load custom_filters %}
+{% load final_report_tags %}
+<div style="display:flex;background-color:#235597;margin:0;">
+    <label class="header-medical-section">Additional questions</label>
+</div>
+<div></div>
+{% if questions %}
+    <table style="width:100%;font-size:15px;margin-top:10px;">
+        {% for question in questions %}
+            <tr>
+              <td>{{ question.question }} - {{ question.instructionadditionanswer.answer }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}

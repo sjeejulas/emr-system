@@ -1,0 +1,104 @@
+{% load final_report_tags %}
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Medidata Medical Website">
+        <meta name="author" content="Mohara Ltd.">
+        <title>Medical Report</title>
+        <style>
+            @page {
+                size: a4 portrait;
+                @frame header_frame {
+                    -pdf-frame-content: header_content;
+                    left: 30pt; width: 532pt; top: 30pt; height: 60pt;
+                }
+                @frame content_frame {
+                    left: 30pt; width: 532pt; top: 90pt; height: 632pt;
+                }
+                @frame footer_frame {
+                    -pdf-frame-content: footer_content;
+                    left: 30pt; width: 532pt; top: 732pt; height: 130pt;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="header_content">
+            <table style="height:65px;">
+                <tr style="padding:2px;">
+                    <td style="width:69%;background-color:black;">
+                        <img src="{% static 'images/custom_images/eMR_med.png' %}" style="width:120px;height:auto">
+                    </td>
+                    <td style="width:1%;"/>
+                    <td style="width:30%;background-color:#00bba3;">
+                        <label style="font-size:13px;">Signed off by:</label>
+                        </br>
+                        <label style="font-size:13px;color:white;">The data controller is</label>
+                        </br>
+                        <label style="font-size:13px;color:white;">{{gp_name|default:"[GP name]"}}</label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="footer_content">
+            <table style="font-size:12px;">
+                <tr style="padding:2px;">
+                    <td style="width:20%;">
+                        <img src="{% static 'images/custom_images/md.png' %}" style="width:80px;height:40px;">
+                    </td>
+                    <td style="width:80%;" colspan="3">
+                        <label style="color:#235597;">
+                            Disclaimer: MediData Exchange Ltd cannot be held responsible for the content of this report as the data redaction process is approved by the Data Controller.
+                        </label>
+                    </td>
+                </tr>
+                <tr style="padding-left:2px;padding-top:3px;">
+                    <td style="background-color:#e6e6e6;width:15%;font-weight:bold;">Name:</td>
+                    <td style="background-color:#e6e6e6;width:20%;">{{medical_record.registration.full_name}}</td>
+                    <td style="background-color:#e6e6e6;width:15%;font-weight:bold;">Date of birth:</td>
+                    <td style="background-color:#e6e6e6;width:50%;">{{medical_record.registration.parsed_date_of_birth|format_date_filter}}</td>
+                </tr>
+                <tr style="padding-left:2px;">
+                    <td style="background-color:#e6e6e6;width:15%;font-weight:bold;">Sex:</td>
+                    <td style="background-color:#e6e6e6;width:20%;">{{medical_record.registration.sex}}</td>
+                    <td style="background-color:#e6e6e6;width:15%;font-weight:bold;">Address:</td>
+                    <td style="background-color:#e6e6e6;width:50%;">{{medical_record.registration.address_lines|join:", "}}</td>
+                </tr>
+                <tr style="padding-left:2px;">
+                    <td style="background-color:#e6e6e6;width:15%;font-weight:bold;">NHS number:</td>
+                    <td style="background-color:#e6e6e6;width:20%;">{{medical_record.registration.nhs_number}}</td>
+                    <td style="background-color:#e6e6e6;width:15%;"/>
+                    <td style="background-color:#e6e6e6;width:50%;"/>
+                </tr>
+            </table>
+        </div>
+        <label style="font-size:60px;color:#235597;margin:0;line-height:60px;">Medical Report</label>
+        <div>
+            {% patient_details %}
+            {% instruction_details %}
+            {% patient_profile %}
+            {% significant_conditions %}
+            {% allergies %}
+            {% consultations %}
+            {% bloods %}
+            {% referrals %}
+            {% medications %}
+            {% appendices %}
+        </div>
+
+        <script>
+
+            window.onload = function() {
+                window.print();
+            };
+            window.onafterprint = function(){
+               window.close();
+             }
+
+        </script>
+    </body>
+</html>

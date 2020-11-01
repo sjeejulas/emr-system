@@ -1,0 +1,58 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div class="container callout callout--no-padding">
+    <div class="row">
+        <div class="col">
+            <h6 class="callout__header">
+                Consultations
+                <span></span>
+            </h6>
+        </div>
+    </div>
+    <div class="row callout__content">
+        <div class="container">
+            <div>
+            {% for model in consultations %}
+                {% with header=model|consultation_header:people dict_data=model|consultation_element_list label=model|consultaion_sick_note map_code=model|map_code %}
+                {% redaction_checkbox_with_list model redaction header dict_data map_code label relations sensitive_conditions %}
+            {% endwith %}
+            {% endfor %}
+            </div>
+            <br>
+            <label class="redaction-additional-header" for="redaction_consultation_notes">
+                Additional contextual information / missing consultations
+            </label>
+            <textarea placeholder="Further information related to this section"
+                      name="redaction_consultation_notes"
+                      id="redaction_consultation_notes">{{ redaction.consultation_notes|default:"" }}</textarea>
+            <button type="button" class="btn btn-primary float-right update_report_btn" id="update_report">Update</button>
+        </div>
+    </div>
+</div>
+{% block Script %}
+    <script>
+        $(function(){
+            $('#update_report').on('click', function() {
+                var consultation_notes = document.getElementsByName('redaction_xpaths');
+                var map_code = document.getElementsByName('map_code');
+                for(var i = 0; i < consultation_notes.length; i++) {
+                    if(!consultation_notes[i].checked) {
+                        $(consultation_notes[i]).val('');
+
+                    }
+                    else {
+                        consultation_notes[i].value =  consultation_notes[i].dataset.redaction_xpaths;
+                        map_code[i].value =  consultation_notes[i].dataset.redaction_condition;
+                    }
+                    if(consultation_notes[i].checked){
+                        $(map_code[i]).val('');
+                    }
+                     else {
+                        map_code[i].value =  consultation_notes[i].dataset.redaction_condition;
+                    }
+                }
+                $('#medicalReportForm').submit();
+            });
+        });
+    </script>
+{% endblock %}

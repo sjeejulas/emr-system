@@ -1,0 +1,20 @@
+<div>
+<label class="redaction-checkbox">
+    {% for xpath in xpaths %}
+    <input name="redaction_xpaths" key="{{ header }}"
+           {{ checked }} readonly type="checkbox" class="redaction-checkbox__input" data-section="{{ section }}"
+           value="{{ xpath }}">
+    {% endfor %}
+    <span class="redaction-checkbox__icon float-right fas fa-check-circle"></span>
+    <span class="redaction-checkbox__header" title="{{ title }}" data-toggle="tooltip">
+        {{ header_detail }}
+        {% if section == 'attachments' and redacted_count != -1 %}
+            <div class="numberCircle">{{ redacted_count }}</div>
+        {% endif %}
+    </span>
+    <span class="redaction-checkbox__text">{{ body }}</span>
+    {% if is_sensitive %}
+        <span class="badge badge-warning">Sensitive Condition</span>
+    {% endif %}
+</label>
+</div>

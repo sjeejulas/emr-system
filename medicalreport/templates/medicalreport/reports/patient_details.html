@@ -1,0 +1,24 @@
+{% load custom_filters %}
+<div style="display:flex;background-color:#235597;margin:0;">
+    <label class="header-medical-section">Patient Details</label>
+</div>
+<table style="width:100%;font-size:15px;margin-top:10px;">
+    <tr>
+        <td style="width:15%;font-weight:bold;">Name:</td>
+        <td style="width:20%;">{{medical_record.registration.full_name}}</td>
+        <td style="width:15%;font-weight:bold;">Date of birth:</td>
+        <td style="width:50%;">{{medical_record.registration.parsed_date_of_birth|format_date_filter}}</td>
+    </tr>
+    <tr>
+        <td style="width:15%;font-weight:bold;">Sex:</td>
+        <td style="width:20%;">{{medical_record.registration.sex}}</td>
+        <td style="width:15%;font-weight:bold;">Address:</td>
+        <td style="width:50%;">{{medical_record.registration.address_lines|join:", "}}</td>
+      </tr>
+    <tr>
+        <td style="width:15%;font-weight:bold;">NHS number:</td>
+        <td style="width:20%;">{{medical_record.registration.nhs_number}}</td>
+        <td style="width:15%;"/>
+        <td style="width:50%;"/>
+    </tr>
+</table>

@@ -1,0 +1,51 @@
+{% load static %}
+
+<h4><strong><span style="color: #212528;">Step 1: </span>&nbsp; Add a new user to EMISweb for eMR </strong></h4>
+<div class="emr-setup-card">
+    <div class="card-body">
+        <p> eMR needs to be able to securely extract consenting patient's data from your EMISweb system. So that you have full
+        control over eMR's access to your patient's data, we need you to create a unique user account in your EMISweb system. </p>
+        <div class="col-md-12">
+            <div class="text-center">
+                <figure class="figure">
+                    <div class="row">
+                        <div class="w-50 mt-3">
+                            <a data-fancybox="gallery" id="setup-min-pic" href={% static 'images/emis_setup/Medidata - Activating in EMIS 02.png' %}>
+                                <img id="setup-full-pic" src="{% static 'images/emis_setup/Medidata - Activating in EMIS 02.png' %}" class="figure-img img-fluid block-img" alt="A generic square placeholder image with rounded corners in a figure.">
+                            </a>
+                        </div>
+                        <div class="w-50">
+                            <figcaption class="figure-caption mt-2 setup-caption" id="setup-caption">a) Menu > Configuration > Organisation Configuration</figcaption>
+                        </div>
+                    </div>
+                </figure>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="col-12 mt-2 block-username" id="username-block">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>When prompted, enter this EMISweb username and password for the new user.</p>
+                        <p>
+                            This strong password has been randomly generated and is unique to your surgery. You will not need to remember it
+                            after this sign up process. Copy and paste it into the EMISweb password field.
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="col-md-12 credentialSection pt-4 pb-3 pl-4 pr-1">
+                            <p>Username:&nbsp; <span class="credential">&nbsp; {{ practice_username }}</span></p>
+                            <p id="password">
+                                Password:&nbsp; <span class="credential">&nbsp; {{ practice_password }}</span>
+                                <button type="button" class="btn btn-default btn-copy js-tooltip js-copy" data-toggle="tooltip" data-placement="bottom" data-copy="{{ practice_password }}" title="Copy to clipboard">
+                                    <i class="fas fa-copy fa-2x"></i>
+                                </button>
+                                Click icon to copy the password
+                            </p>
+                        </div>
+                    </div>
+                    <div id="step2-index"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

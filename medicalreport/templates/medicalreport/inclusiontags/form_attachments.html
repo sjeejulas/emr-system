@@ -1,0 +1,39 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div class="container callout callout--no-padding">
+    <div class="row">
+        <div class="col">
+            <h6 class="callout__header">
+                 Attachments
+                <span></span>
+            </h6>
+        </div>
+    </div>
+    <div class="row callout__content">
+        <div class="container">
+            <div>
+            {% for model in attachments %}
+              {% with header=model.parsed_date|format_date_filter|add:" - "|add:model.description %}
+                {% with have_attachment=redacted_attachments|get_attachment:model.dds_identifier %}
+                  <a class="attachment-preview-link {% if not have_attachment %}attachment-not-active{% endif %}" target="_blank"
+                     href="/medicalreport/{{ instruction.id }}/attachment/{{ model.dds_identifier }}"
+                     title="{% if not have_attachment %}Redaction in process, please wait until complete{% else %}Preview{% endif%}"
+                     {% if not have_attachment %}onclick="return false"{% endif %}
+                     instruction="{{ instruction.id }}" attachment="{{ model.dds_identifier }}">
+                     <i class="fas fa-paperclip"></i>
+                  </a>
+                  {% redaction_checkbox_with_body model redaction header section='attachments' %}
+                {% endwith %}
+              {% endwith %}
+            {% endfor %}
+            </div>
+            <br>
+            <label class="redaction-additional-header" for="redaction_attachment_notes">
+                Additional contextual information
+            </label>
+            <textarea placeholder="Further information related to this section" 
+                      name="redaction_attachment_notes" id="redaction_attachment_notes">{{ redaction.attachment_notes|default:"" }}</textarea>
+            <button type="submit" class="btn btn-primary float-right update_report_btn">Update</button>
+        </div>
+    </div>
+</div>

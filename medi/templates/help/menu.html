@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+
+{% block ExtraHead %}
+    <link href="{% static 'css/help/help.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'assets/fancybox/jquery.fancybox.min.css' %}" />
+{% endblock %}
+
+{% block Content %}
+    <div class="card">
+        <div class="card-body pt-4">
+            <div class="container-fluid">
+                <div class="col-md-12">
+                    Material contained in this section includes: training materials for Surgery staff users, information for Patients and 3 Parties.<br>
+                    Simply click on each link to access.
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">&nbsp;</div>
+    
+    <div class="row">
+        <div class="col-5">
+            <label class="label-title">Guide Menu</label>
+            <div class='accordion' id="menu1">
+                <!-- Dropdown 1 -->
+                <div class="card">
+                    <div class="card-header bg-primary" id="title1">
+                        <h5 class="mb-0">
+                            <button class="choice-1 btn btn-link text-light" type="button" data-toggle="collapse" data-target="#detail1" aria-expanded="true" aria-controls="detail1">
+                                <strong><i class="fas fa-caret-down" id="symbol-1"></i>&nbsp;&nbsp;Starter Guide</strong>
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="detail1" class="collapse show" aria-labelby="title1" data-parent="#menu1">
+                        <div class="card-body">
+                            <div class="btn-group-vertical col-12">
+                                <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(11);">Set-up user guide</a>
+                                <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(12);">Set-up video</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dropdown 2 -->
+                <div class="card">
+                    <div class="card-header bg-primary" id="title2">
+                        <h5 class="mb-0">
+                            <button class="choice-2 btn btn-link text-light" type="button" data-toggle="collapse" data-target="#detail2" aria-expanded="false" aria-controls="detail2">
+                                <strong><i class="fas fa-caret-right" id="symbol-2"></i>&nbsp;&nbsp;SARs Guide</strong>
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="detail2" class="collapse" aria-labelby="title2" data-parent="#menu1">
+                        <div class="card-body">
+                            <div class="btn-group-vertical col-12">
+                                <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(21);">SARs user guide</a>
+                                <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(22);">SARs video</a>
+                                <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(23);">SARs process map</a>
+                                <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(24);">Dual Consent Form</a>
+                                <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(25);">SAR Consent Flow</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dropdown 3 -->
+                <div class="card">
+                    <div class="card-header bg-primary" id="title3">
+                        <h5 class="mb-0">
+                            <button class="choice-3 btn btn-link text-light" type="button" data-toggle="collapse" data-target="#detail3" aria-expanded="false" aria-controls="detail3">
+                                <strong><i class="fas fa-caret-right" id="symbol-3"></i>&nbsp;&nbsp;AMRA Guide</strong>
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="detail3" class="collapse" aria-labelby="title3" data-parent="#menu1">
+                        <div class="card-body">
+                            <div class="card-body">
+                                <div class="btn-group-vertical col-12">
+                                    <a class="btn btn-block disabled" href="#" role="button">AMRA user guide</a>
+                                    <a class="btn btn-block disabled" href="#" role="button">AMRA video</a>
+                                    <a class="btn btn-block disabled" href="#" role="button">AMRA Fees guidelines</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dropdown 4 -->
+                <div class="card">
+                    <div class="card-header bg-primary" id="title4">
+                        <h5 class="mb-0">
+                            <button class="choice-4 btn btn-link text-light" type="button" data-toggle="collapse" data-target="#detail4" aria-expanded="false" aria-controls="detail4">
+                                <strong><i class="fas fa-caret-right" id="symbol-4"></i>&nbsp;&nbsp;Patient & Third Party Handouts</strong>
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="detail4" class="collapse" aria-labelby="title4" data-parent="#menu1">
+                        <div class="card-body">
+                            <div class="card-body">
+                                <div class="btn-group-vertical col-12">
+                                    <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(41);">SARs for Patients</a>
+                                    <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(42);">SARs for Solicitors</a>
+                                    <a class="btn btn-block disabled" href="#" role="button">AMRA for Patients</a>
+                                    <a class="btn btn-block disabled" href="#" role="button">AMRA for Solicitors</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dropdown 6-->
+                <div class="card">
+                    <div class="card-header bg-primary" id="title6">
+                        <h5 class="mb-0">
+                            <button class="choice-6 btn btn-link text-light" type="button" data-toggle="collapse" data-target="#detail6" aria-expanded="false" aria-controls="detail6">
+                                <strong><i class="fas fa-caret-right" id="symbol-6"></i>&nbsp;&nbsp;Fee</strong>
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="detail6" class="collapse" aria-labelby="title6" data-parent="#menu1">
+                        <div class="card-body">
+                            <div class="card-body">
+                                <div class="btn-group-vertical col-12">
+                                    <a class="btn btn-block disabled" href="#" role="button">This is Fee choice. 1</a>
+                                    <a class="btn btn-block disabled" href="#" role="button">This is Fee choice. 2</a>
+                                    <a class="btn btn-block disabled" href="#" role="button">This is Fee choice. 3</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dropdown 5-->
+                <div class="card">
+                    <div class="card-header bg-primary" id="title5">
+                        <h5 class="mb-0">
+                            <button class="choice-5 btn btn-link text-light" type="button" data-toggle="collapse" data-target="#detail5" aria-expanded="false" aria-controls="detail5">
+                                <strong><i class="fas fa-caret-right" id="symbol-5"></i>&nbsp;&nbsp;Other Documents</strong>
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="detail5" class="collapse" aria-labelby="title5" data-parent="#menu1">
+                        <div class="card-body">
+                            <div class="card-body">
+                                <div class="btn-group-vertical col-12">
+                                    <a class="btn btn-block disabled" href="#" role="button">End user-license</a>
+                                    <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(52);">Data Policy</a>
+                                    <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(53);">Terms & Conditions</a>
+                                    <a class="btn btn-block" href="#" role="button" onclick="return changeScreen(54);">IT environment and data security</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-7" id="previewId">
+            <!-- Set for default PDF -->
+            <div id="default-preview">
+                <label class="label-title" id="previewTitle">Welcome to Resource Centre</label>
+                <div class="iframe" id="iframe">
+                    <object data="{% static 'documents/Welcome to your Resource Centre.RF (002).pdf' %}#view=FitH" height="500px" width="100%" id="path1">
+                        <embed data="{% static 'documents/Welcome to your Resource Centre.RF (002).pdf' %}" id="path2"/>
+                    </object>
+                </div>
+                <a href="{% static 'documents/Welcome to your Resource Centre.RF (002).pdf' %}" target="_blank" id="linkPreviewModeId">
+                    <button type="button" class="btn btn-primary btn-block btn-lg">
+                        <i class="fas fa-search"></i>&nbsp;&nbsp;Click to preview
+                    </button>
+                </a>
+            </div>
+            <!-- Include for all PDF-Preview -->
+            {% include 'help/pdf_preview_field.html' %}
+
+            <!-- Set for Video-player -->
+            <label class="label-title video-title" id="videoTitle"></label>
+            <iframe id="videoPlayerId" width="100%" height="100%" class="col-12 video-player" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+        </div>
+    </div>
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/help/help.js' %}"></script>
+    <script>
+         $(document).ready(function () {
+             $('#videoPlayerId').hide();
+             $('#videoTitle').hide();
+         });
+    </script>
+{% endblock %}

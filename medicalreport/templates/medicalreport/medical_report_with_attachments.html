@@ -1,0 +1,49 @@
+{% load custom_filters %}
+{% load medi_report_tags %}
+{% load final_report_tags %}
+{% load get_permissions %}
+
+<div class="col-md-3 files">
+    <ul class="report-attachment">
+        {% if instruction.mdx_consent %}
+            <li id="report-consent" class="medical-report reports" onclick="renderReport(this)"><i class="fas fa-paperclip"></i> Consent Form PDF </li>
+        {% endif %}
+        <li id="report-0" class="medical-report reports active" onclick="renderReport(this)"><i class="fas fa-file"></i> Medical Record</li>
+        {% for attachment in attachments %}
+            {% with header=attachment.parsed_date|format_date_filter|add:" - "|add:attachment.description %}
+                {% with attachment|check_file_white_list as white_list %}
+                    {% if white_list %}
+                        <li id="report-{{forloop.counter}}" class="reports" onclick="renderReport(this)"><i class="fas fa-paperclip"></i> {{header}}</li>
+                    {% else %}
+                        <li id="report-{{forloop.counter}}" class="reports download_attachment" onclick="renderReport(this)"><i class="fas fa-cloud-download-alt"></i> {{header}}</li>
+                    {% endif %}
+                {% endwith %}
+            {% endwith %}
+        {% endfor %}
+    </ul>
+</div>
+<div class="col-md-9">
+    {% if instruction.mdx_consent %}
+        <embed id="attachment-consent" class="attachments" src="{% url 'medicalreport:view_consent_pdf' instruction.id %}" width="100%" height="100%" alt="pdf" style="display:none">
+    {% endif %}
+    <embed id="attachment-0" class="attachments" src="{% url 'medicalreport:view_report' instruction.id %}" width="100%" height="100%" alt="pdf">
+    {% for attachment in attachments %}
+        {% with header=attachment.parsed_date|format_date_filter|add:" - "|add:attachment.description %}
+            <embed id="attachment-{{forloop.counter}}" class="attachments" src="/medicalreport/{{ instruction.id }}/attachment/{{ attachment.dds_identifier }}" width="100%" height="100%" alt="pdf" style="display:none">
+        {% endwith %}
+    {% endfor %}
+</div>
+
+{% block Script %}
+    <script>
+        $(document).ready(function () {
+            object_name = '{{instruction.mdx_consent.name}}';
+            object_extension = object_name.split('.').pop();
+
+            if (object_extension != 'pdf') {
+                $('#report-consent').remove();
+                $('#attachment-consent').remove();
+            }
+        });
+    </script>
+{% endblock %}

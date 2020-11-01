@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+
+
+{% block ExtraHead %}
+    {% comment %} CSS {% endcomment %}
+{% endblock %}
+
+{% block Content %}
+    <div class="container-fluid">
+        <div class="col-12">
+            <h6>Summary Report : <strong>{{ currentYear }}</strong><h6>
+            <div class="card">
+                <div class='container-fluid'>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class='col-4 text-left'>
+                                <a href='/report/summary-report?current_year={{ previousYear }}'><i class="fas fa-caret-left"></i>&nbsp;&nbsp;{{ previousYear }}</a>
+                            </div>
+                            <div class="col-4 text-center">
+                                Year : {{ currentYear }}
+                            </div>
+                            <div class='col-4 text-right'>
+                                <a href='/report/summary-report?current_year={{ nextYear }}'>{{ nextYear }}&nbsp;&nbsp;<i class="fas fa-caret-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">&nbsp;</div>
+        <div class="col-12">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-4">
+                        <button class="btn btn-secondary btn-block" id="chart1Btn" type="button">
+                            <i class="far fa-chart-bar"></i>&nbsp;&nbsp;Instructions Charts
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-secondary btn-block" id="chart2Btn" type="button">
+                            <i class="fas fa-chart-line"></i>&nbsp;&nbsp;Fee Charts
+                        </button>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-secondary btn-block" id="chart3Btn" type="button">
+                            <i class="far fas fa-columns"></i>&nbsp;&nbsp;All Charts
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12" id="chart1">
+                <div class="col-12">&nbsp;</div>
+                <canvas id="summaryChart1" width="auto" height="auto"></canvas>
+                <div class="col-12 text-center mt-3">
+                    <label><strong>Instructions Chart</strong></label>
+                </div>
+            </div>
+            <div class="col-12" id="chart2" style='display:none'>
+                <div class="col-12">&nbsp;</div>
+                <canvas id="summaryChart2" width="auto" height="auto"></canvas>
+                <div class="col-12 text-center mt-3">
+                    <label><strong>Fee Chart</strong></label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/report/chartJS/Chart.bundle.js' %}"></script>
+    <script src="{% static 'js/report/chartJS/Chart.js' %}"></script>
+    <script>
+        var ctx1 = document.getElementById("summaryChart1");
+        var summaryChart1 = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
+                datasets: [{
+                    label: "New",
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    data: {{ newList }}
+                },
+                {
+                    label: "In Progress",
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    data: {{ progressList }}
+                },
+                {
+                    label: "Complete",
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    data: {{ completeList }}
+                },
+                {
+                    label: "Reject",
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255,99,132,1)',
+                    data: {{ rejectList }}
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true,
+                            precision: 0
+                        }
+                    }]
+                }
+            }
+        });
+
+        var ctx2 = document.getElementById("summaryChart2");
+        var summaryChart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
+                datasets: [{
+                    label: "Paid",
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    data: {{ paidList }}
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true,
+                            precision: 2
+                        }
+                    }]
+                }
+            }
+        });
+
+        $('#chart1Btn').click( function() {
+            $('#chart2').hide();
+            $('#chart1').show();
+
+            $('#chart1').removeClass('col-6');
+            $('#chart1').addClass('col-12');
+        });
+
+        $('#chart2Btn').click( function() {
+            $('#chart1').hide();
+            $('#chart2').show();
+
+            $('#chart2').removeClass('col-6');
+            $('#chart2').addClass('col-12');
+        });
+
+        $('#chart3Btn').click( function() {
+            $('#chart1').show();
+            $('#chart2').show();
+
+            $('#chart1').removeClass('col-12');
+            $('#chart2').removeClass('col-12');
+
+            $('#chart1').addClass('col-6');
+            $('#chart2').addClass('col-6');
+        });
+
+    </script>
+{% endblock %}

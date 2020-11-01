@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block ExtraHead %}
+    <link rel="stylesheet" href="{% static 'css/instructions/consent_form.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/kartik-v-boostrap-fileinput/css/fileinput.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/kartik-v-boostrap-fileinput/themes/explorer-fas/theme.css' %}">
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/js/fileinput.js' %}"></script>
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/js/locales/LANG.js' %}"></script>
+    <script src="{% static 'assets/kartik-v-boostrap-fileinput/themes/fas/theme.js' %}"></script>
+{% endblock %}
+
+{% block Content %}
+    <form method="POST" action="{% url 'instructions:upload_consent' instruction.id %}" id="consentForm" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if uploaded %}
+            <h1>Upload successfully</h1>
+        {% else %}
+            <div class="card-deck">
+                <div class="card">
+                    <div class="card-header">
+                        <select class="form-control" id="id_select" onchange="onSelect(this)" name="select_type">
+                            <option value="">------------ Please select --------------</option>
+                            <option value="accept">Accept Consent</option>
+                            <option value="upload">Upload Consent</option>
+                        </select>
+                    </div>
+                    <div id="id_upload" class="card-body" style="display: none">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="file-loading">
+                                        {% bootstrap_field consent_form.consent_form show_label=False %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="id_accept" class="card-body pdf" style="display: none">
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% static '/' as path %}
+                                <embed src="{{setting.consent_form.url}}" width="100%" height="100%" alt="pdf">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="btn_upload" class="col-md-4 mt-4 buttons" style="display: none">
+                <button type="submmit" class="btn btn-primary btn-lg w-75">Upload</button>
+            </div>
+            <div id="btn_accept" class="col-md-4 mt-4 buttons" style="display: none">
+                <button type="submmit" class="btn btn-primary btn-lg w-75">Accept</button>
+            </div>
+        {% endif %}
+    </form>
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static '/js/instructions/consent_form.js' %}"></script>
+    <script>
+        var selectType = "{{ select_type }}";
+        if((navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true )){
+            $("#id_consent_form").fileinput({
+                theme: 'fas',
+                showUpload: false,
+                showPreview: false,
+            });
+        } else {
+            $("#id_consent_form").fileinput({
+                theme: 'fas',
+                showUpload: false,
+            });
+        }
+        renderType(selectType);
+    </script>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% bootstrap_messages %}
+
+
+{% block ExtraHead %}
+    <link href="{% static 'css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/onboarding/sign_up.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+
+{% block Content %}
+{% include 'onboarding/progress_bar_onboard.html' %}
+    <div class="card emrMessage">
+        <div class="centerMessage">
+            {% if welcome_message1 %}
+                <div class="welcomeMessage">
+                    <p>{{ welcome_message1 }}</p>
+                    <p>{{ welcome_message2 }}</p>
+                    <p>Return to the <a href="{{ login_link }}">log-in page</a></p>
+                </div>
+            {% elif message_1 %}
+                <div class="col-md-12 ">
+                    <p>{{ message_1 }}</p>
+                    <p>{{ message_2 }}</p>
+                    <p>{{ message_3 }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block Script %}
+    <script>
+    $(document).ready(function () {
+        //  Set value in progress bar.
+        $('#progress_percent').text('100%');
+        $('#progress_bar').attr('aria-valuenow', '100');
+        $('#progress_bar').css('width', '100%');
+
+        $('#id_label').removeClass('text-danger');
+
+        $('#id_label').addClass('text-success');
+    });
+    </script>
+{% endblock %}

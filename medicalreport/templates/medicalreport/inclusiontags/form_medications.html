@@ -1,0 +1,64 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div class="container callout callout--no-padding">
+    <div class="row">
+        <div class="col">
+            <h6 class="callout__header">
+                Medications
+                <span></span>
+            </h6>
+        </div>
+    </div>
+    <div class="row callout__content">
+        <div class="container">
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <a class="nav-item nav-link active" id="nav-acute-medications-tab" data-toggle="tab" href="#nav-acute-medications" role="tab" aria-controls="nav-acute-medications" aria-selected="true">Acute</a>
+                    <a class="nav-item nav-link" id="nav-repeat-medications-tab" data-toggle="tab" href="#nav-repeat-medications" role="tab" aria-controls="nav-repeat-medications" aria-selected="false">Repeat</a>
+                    <a class="nav-item nav-link" id="nav-add-medications-tab" data-toggle="tab" href="#nav-add-medications" role="tab" aria-controls="nav-add-medications" aria-selected="false">Add medications</a>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-acute-medications" role="tabpanel" aria-labelledby="nav-acute-medications-tab">
+                    {% for model in acute_medications%}
+                    {% with header=model|general_header  %}
+                        {% redaction_checkbox_with_body model redaction header word_library section='acute_medications' %}
+                    {% endwith %}
+                    {% endfor %}
+                    {% form_additional_medications additional_acute_medications %}
+                    <br>
+                    <label class="redaction-additional-header" for="redaction_acute_prescription_notes">
+                        Additional contextual information
+                    </label>
+                    <textarea placeholder="Further information related to this section" 
+                            name="redaction_acute_prescription_notes" 
+                            id="redaction_acute_prescription_notes">{{ redaction.acute_prescription_notes|default:"" }}</textarea>
+                    <button type="submit" class="btn btn-primary float-right update_report_btn">Update</button>
+                </div>
+                <div class="tab-pane fade" id="nav-repeat-medications" role="tabpanel" aria-labelledby="nav-repeat-medications-tab">
+                    {% for model in repeat_medications%}
+                    {% with header=model|general_header %}
+                        {% redaction_checkbox_with_body model redaction header word_library section='repeat_medications' %}
+                    {% endwith %}
+                    {% endfor %}
+                    {% form_additional_medications additional_repeat_medications %}
+                    <br>
+                    <label class="redaction-additional-header" for="redaction_repeat_prescription_notes">
+                        Additional contextual information
+                    </label>
+                    <textarea placeholder="Further information related to this section" 
+                            name="redaction_repeat_prescription_notes" 
+                            id="redaction_repeat_prescription_notes">{{ redaction.repeat_prescription_notes|default:"" }}</textarea>
+                    <button type="submit" class="btn btn-primary float-right update_report_btn">Update</button>
+                </div>
+                <div class="tab-pane fade" id="nav-add-medications" role="tabpanel" aria-labelledby="nav-add-medications-tab">
+                    {% form_new_additional_medications instruction %}
+                    <button type="submit"
+                            id="addMedicationButton"
+                            class="btn btn-primary float-right"
+                            onclick="subMitMedicalReport('add-medication')">Add Medication</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

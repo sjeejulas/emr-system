@@ -1,0 +1,48 @@
+AMRA_TYPE = 'AMRA'
+SARS_TYPE = 'SARS'
+
+INSTRUCTION_TYPE_CHOICES = (
+    (AMRA_TYPE, 'AMRA'),
+    (SARS_TYPE, 'SARS')
+)
+
+INSTRUCTION_STATUS_NEW = 0
+INSTRUCTION_STATUS_PROGRESS = 1
+INSTRUCTION_STATUS_COMPLETE = 2
+INSTRUCTION_STATUS_REJECT = 3
+INSTRUCTION_STATUS_PAID = 4
+INSTRUCTION_STATUS_FINALISE = 5
+INSTRUCTION_STATUS_RERUN = 6
+INSTRUCTION_STATUS_REDACTING = 7
+
+INSTRUCTION_STATUS_CHOICES = (
+    (INSTRUCTION_STATUS_NEW, 'New'),
+    (INSTRUCTION_STATUS_PROGRESS, 'In Progress'),
+    (INSTRUCTION_STATUS_COMPLETE, 'Completed'),
+    (INSTRUCTION_STATUS_REJECT, 'Rejected'),
+    (INSTRUCTION_STATUS_PAID, 'Paid'),
+    (INSTRUCTION_STATUS_FINALISE, 'Finalising'),
+    (INSTRUCTION_STATUS_RERUN, 'Rerun'),
+    (INSTRUCTION_STATUS_REDACTING, 'Redacting')
+)
+
+CONSENT_INVALID = 0
+CONSENT_NOT_PROPERLY = 1
+INAPPROPRIATE_SAR = 2
+PATIENT_NOT_FOUND = 3
+LONG_TIMES = 4
+PATIENT_NO_LONGER_REGISTERED = 5
+GENERATOR_FAIL = 6
+CANCEL_BY_CLIENT = 7
+INSTRUCTION_REJECT_TYPE = (
+    (CONSENT_INVALID, 'The consent form is invalid'),
+    (CONSENT_NOT_PROPERLY, 'Inappropriate consent / consent not properly obtained'),
+    (INAPPROPRIATE_SAR, 'Inappropriate instruction for Subject Access Request'),
+    (PATIENT_NOT_FOUND, 'No suitable patient can be found'),
+    (LONG_TIMES, 'The instruction can not be processed by the due date'),
+    (PATIENT_NO_LONGER_REGISTERED, 'The patient is no longer registered at this practice'),
+    (GENERATOR_FAIL, 'The report failed to generate'),
+    (CANCEL_BY_CLIENT, 'Cancel instruction by client.')
+)
+
+REJECT_PENDING_INSTRUCTION_DAY = 23

@@ -1,0 +1,35 @@
+{% load static %}
+<link href="{% static 'css/onboarding/progess_bar_onboard.css' %}" rel="stylesheet"/>
+
+<div class="card top-progress">
+    <div class="card-body pb-1">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-2 text-center">
+                    <h6>Progress : <label class="text-danger" id="id_label"><strong id="progress_percent">0 %</strong></label></h6>
+                </div>
+                <div class="col-7">
+                    <div class="progress">
+                        <div class="progress-bar bg-success" id="progress_bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div style="margin-top: -15px">
+                        <div class="waypoint" id="step1_waypoint">Your Surgery</div>
+                        <div class="waypoint" id="step2_waypoint">Your Users</div>
+                        <div class="waypoint" id="step3_waypoint">Connect eMR to EMIS</div>
+                        <div class="sub-waypoint" id="step3_subwaypoint1"></div>
+                        <div class="sub-waypoint" id="step3_subwaypoint2"></div>
+                        <div class="sub-waypoint" id="step3_subwaypoint3"></div>
+                        <div class="waypoint" id="last_waypoint"></div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <a href="{% static 'documents/Quick Set Up Guide v5.3 new process.pdf' %}" target="_blank" id="btn_setup_guide">
+                        <button type="button" class="btn btn-primary btn-sm">Set up Guide</button>
+                    </a>
+                    <button id="btn_get_help" class="btn btn-primary btn-sm" onclick="Intercom('show');">Get Help</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class='col-12'>&nbsp;</div>

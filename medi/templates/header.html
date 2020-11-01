@@ -1,0 +1,59 @@
+{% load static %}
+<header >
+    <nav class="navbar navbar-expand-lg navbar-top">
+        <a class="navbar-brand" href="#">{{ header_title }}</a>
+        {% if request.resolver_match.app_name != 'onboarding' %}
+            <div class="container-fluid float-right justify-content-end ">
+                {% if user.type%}
+                    <div class="dropdown">
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#" data-toggle="dropdown">
+                            <span class="username">{{ user.first_name }}  {{ user.last_name }}</span> <span class="caret"></span>
+                        </a>
+                        <div class="dropdown-menu header-menu">
+                            <a href="{% url 'accounts:view_profile' %}" class="dropdown-item"><i class="fas fa-user-plus"></i> Profile</a>
+                            <a href="{% url 'accounts:password_change' %}" class="dropdown-item"><i class="fas fa-key"></i> Change Password</a>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if request.session.session_key %}
+                    <div>
+                        <a href="{% url 'accounts:logout' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                {% endif %}
+             </div>
+         {% endif %}
+    </nav>
+</header>
+<script>
+
+var logout_url = "{% url 'accounts:logout' %}";
+
+$(function() {
+
+    var t;
+    var timeout_interval = 600000; // 10 minutes
+
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    document.onmousedown = resetTimer;
+    document.onclick = resetTimer; 
+    document.onscroll = resetTimer;
+
+    function resetTimer() {
+       clearTimeout(t);
+       t = setTimeout(function(){ 
+              window.location.href = logout_url; 
+           }, timeout_interval);
+    }
+
+});
+
+document.addEventListener("keydown", function(event) { 
+    var logout_keyCode_F6 = 117;    
+    if(event.keyCode == logout_keyCode_F6) {
+      window.location.href = logout_url; 
+    }
+});
+
+</script>

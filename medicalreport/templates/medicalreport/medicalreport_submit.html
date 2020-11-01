@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% load custom_filters %}
+{% load medi_report_tags %}
+{% load final_report_tags %}
+{% load get_permissions %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link rel="stylesheet" href="{% static 'medicalreport/css/medicalreport.css' %}">
+{% endblock %}
+
+{% block Content %}
+    <div class="container">
+        <form action="{% url 'medicalreport:update_report' instruction.id %}" method="post" id="medicalReportForm">
+            {% csrf_token %}
+            <div class="card-deck">
+                <div class="card">
+                    <div class="card-body final-report">
+                        <div class="row">
+                            {% include 'medicalreport/medical_report_with_attachments.html' %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 pl-0 pr-0 mt-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                               <div class="col-md-12">
+                                    <h2 class="d-flex justify-content-center">Finalise and Submit</h2>
+                                </div>
+                                <div class="col-md-12 finalise-submit">
+                                    <div class="col-md-12">
+                                        {% if not instruction.type == 'SARS' %}
+                                            <label style="margin-top: 15px"> I confirm that : </label>
+                                            <ul>
+                                                <li>this medical report relates to the correct patient (“Patient”)</li>
+                                                <li>
+                                                    this medical report is an accurate reflection of the information contained in the electronic medical record of the Patient
+                                                    at the date this medical report is submitted; the contents of this medical report are limited solely to the information
+                                                    which relates to the requested conditions for the Patient, as listed in “Patient Info”
+                                                </li>
+                                                <li>
+                                                    I have not willingly redacted, without good reason,
+                                                    any information from the electronic medical record of the Patient which should be included in the medical report being submitted
+                                                    and
+                                                </li>
+                                                <li>
+                                                    I have reviewed the medical report and it does not contain reference to third parties or any Sensitive Conditions of the Patient.
+                                                    I acknowledge that the “Sensitive Conditions” are those conditions listed in the following link
+                                                    <a target="_blank" href="https://isd.digital.nhs.uk/trud3/user/guest/group/0/pack/9/subpack/141/releases"> here.</a>
+                                                </li>
+                                            </ul>
+                                        {% else %}
+                                            <label style="margin-top: 15px"> I confirm that : </label>
+                                            <ul>
+                                                <li>this medical record relates to the correct patient ("Patient")</li>
+                                                <li>
+                                                    this medical record is an accurate reflection of the information contained in the electronic medical record of the Patient at the date this medical record is submitted
+                                                </li>
+                                                <li>
+                                                    If appropriate, our confidentiality policies have been applied to producing a copy of this medical record
+                                                </li>
+                                                <li>
+                                                    I have not willingly redacted, without good reason,
+                                                    any information from the electronic medical record of the Patient which should be included in the medical record being submitted: and
+                                                </li>
+                                                <li>
+                                                    I have reviewed the medical record and it does not contain reference to third parties or any Sensitive Conditions of the Patient.
+                                                    I acknowledge that the ‘Sensitive Conditions’ are those listed in the following link
+                                                    <a target="_blank" href="https://isd.digital.nhs.uk/trud3/user/guest/group/0/pack/9/subpack/141/releases"> here.</a>
+                                                </li>
+                                            </ul>
+                                        {% endif %}
+                                        <label style="margin-top: 15px"> This report does not include : </label>
+                                        <ul>
+                                            <li>undisclosed conditions of the Patient</li>
+                                            <li>undisclosed symptoms of the Patient</li>
+                                            <li>medical records of the Patient that are not relevant to requested conditions listed in “Patient Info”</li>
+                                            <li>information which the Patient has not consented to being disclosed or any other information that is not included in the Patient’s electronic medical records.</li>
+                                        </ul>
+
+                                    </div>
+                                    <hr width="80%">
+                                    <div class="col-12">&nbsp;</div>
+                                    <div class="row submit-panel">
+                                        <div class="col-md-12">
+                                            <div class="row ml-2">
+                                                {% if request.user.id|sign_off_report:instruction.id %}
+                                                    <div class="col-md-12">
+                                                        {% bootstrap_field finalise_submit_form.prepared_and_signed show_label=""%}
+                                                        {% bootstrap_field finalise_submit_form.prepared_by show_label="" %}
+                                                        <label class="agreement-checkbox" for="accept_disclaimer" style="font-size: large;">
+                                                            <input type="checkbox" id="accept_disclaimer" class="mt-2">
+                                                            <span>I accept that MediData Exchange Ltd cannot be held responsible for the content of this report as the data redaction process is approved by me, the Data Controller.</span>
+                                                        </label>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="row ml-2 mt-2">
+                                                <div class="col-md-12">
+                                                    <input type="hidden" name="event_flag" id="event_flag">
+                                                    <a href="{% url 'medicalreport:edit_report' instruction.id %}"
+                                                       class="btn btn-editReportButton mr-3">
+                                                        Edit Report
+                                                    </a>
+                                                    {% if request.user.id|sign_off_report:instruction.id %}
+                                                        <button type="button" id="submitButton" onclick="subMitMedicalReport('submit')"
+                                                                class="btn btn-info"><i class="fas fa-check"></i> Submit Report</button>
+                                                    {% endif %}
+                                                    <div class="row">
+                                                        <div class="col-md-9 pl-4">
+                                                            <p id="last-warning">You will not be able to make any amends once submitted.</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Modal for confirm before submit. -->
+                                        <div class="modal fade" id="confirmSubmitModal" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-body">
+                                                        <div class="container">
+                                                            <div class="col-12 text-center">
+                                                                <h5><strong>Are you sure you wish to submit ?</strong></h5>
+                                                                <label>Once submitted you will not be able to make any amendments. </label>
+                                                            </div>
+                                                            <div class="col-12">&nbsp;</div>
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <button type="button" class="btn btn-primary btn-block" id="submitConfirmButton" onclick="submitConfirmReport('confirm')">Proceed</button>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal" onclick="showHiddenReport()">Go Back</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg bg-info">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="col-12 text-center mt-2">
+                            <img src="{% static 'images/custom_images/loading.gif'%}" class="img-fluid">
+                            <div class="col-12">&nbsp;</div>
+                            <h4>Patient : <strong>{{ patient_full_name }}</strong></h4>
+                            <h4 class="mt-2">The medical record or report will be generated soon.</h4>
+                            <label class="text-danger mt-4">Please don't leave this page. Process is running ....</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block Script %}
+    <script src="{% static 'medicalreport/js/medicalreport.js' %}"></script>
+    <script>
+        $('#submitConfirmButton').click( function() {
+            if($('#accept_disclaimer').is(":checked")){
+                $('#loadingModal').modal({
+                    backdrop: "static"
+                });
+            }
+        });
+        $('.panel-close').click(function() {
+            $('.bottom-panel').hide(500);
+        });
+    </script>
+{% endblock %}

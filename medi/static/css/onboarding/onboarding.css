@@ -1,0 +1,161 @@
+html,
+body {
+    /* display: -ms-flexbox; */
+    /* display: flex; */
+    -ms-flex-align: center;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #f5f5f5;
+    height: 100%;
+}
+
+.outer {
+    background-color: #0000000f;
+    display: table;
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.middle {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.inner {
+    background-color: white;
+    padding: 35px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 450px;
+    /*whatever width you want*/
+}
+
+.terms-policy {
+    display: flex;
+    justify-content: space-between;
+}
+
+.space-around {
+    justify-content: space-around;
+}
+
+.terms-policy button {
+    text-decoration: underline;
+    color: #0056b3;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.terms-policy p {
+    margin-bottom: 0;
+}
+
+.footer {
+    margin: 0 3rem;
+    margin-bottom: 2rem;
+}
+
+.modal-dialog {
+    max-width: 80%;
+    height: 90%;
+}
+
+.medi-logo {
+    background-color: black;
+    border: 10px solid black;
+    border-radius: 20px;
+}
+
+
+#step_form .card-header {
+    background-color: #36569a;
+    color: whitesmoke;
+}
+
+#step_form .card-body {
+    color: black;
+}
+
+#step_form .card {
+    margin-bottom: 10px;
+}
+
+.subheader {
+    margin-bottom: 20px;
+}
+
+.red{
+    color: #e80000;
+}
+
+.active-a {
+    text-decoration: underline;
+    color: #007bff;
+}
+
+.policy-modal {
+    max-width: 80%;
+}
+
+.title-pos {
+    line-height: 2.5rem;
+}
+
+.emrMessage {
+    text-align: center;
+    height: 50vh;
+}
+
+.welcomeMessage {
+    margin: 0px;
+    font-size: 30px;
+}
+
+.centerMessage {
+    margin-top: 6rem;
+}
+
+.info-icon {
+    width: 50px;
+    margin: 0 auto;
+}
+
+#clinical_info {
+    position: absolute;
+    width: 300px;
+    height: 160px;
+    top: -165px;
+    left: -240px;
+    border: 2px solid;
+    background-color:#34b8a4;
+    font-size: 19px;
+    padding: 20px 16px;
+    text-align: center;
+    border-color: rgb(46, 144, 142);
+    display: none;
+    color: white;
+}
+
+#phone_info {
+    position: absolute;
+    width: 300px;
+    height: 160px;
+    top: -175px;
+    left: -140px;
+    border: 2px solid;
+    background-color: #34b8a4;
+    font-size: 18px;
+    padding: 20px 16px;
+    text-align: center;
+    display: none;
+    border-color: rgb(46, 144, 142);
+    color: white;
+}
+
+#step_form .btn-continue {
+    float: right;
+}

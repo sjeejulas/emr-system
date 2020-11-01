@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link href="{% static 'css/accounts/view_profile.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/intlTelInput.min.css' %}">
+{% endblock %}
+
+{% block Content %}
+    <div class="alert alert-info" role="alert">
+        <span>If you have any queries please email us on emr@medi2data.com or contact our support team on 03333 0 55774</span>
+    </div>
+    <form action="{% url 'accounts:view_profile' %}" method="post" id="createuser">
+          {% csrf_token %}
+          <div class="row">
+              <div class="col-md-3"><label>First Name</label></div>
+              <div class="col-md-4">
+                  {% bootstrap_field user_form.first_name show_label=false %}
+              </div>
+          </div>
+          <div class="row mt-2">
+              <div class="col-md-3"><label>Last Name</label></div>
+              <div class="col-md-4">
+                  {% bootstrap_field user_form.last_name show_label=false %}
+              </div>
+          </div>
+          <div class="row mt-2">
+              <div class="col-md-3"><label>Email</label></div>
+              <div class="col-md-4">
+                  {% bootstrap_field user_form.email show_label=false %}
+              </div>
+          </div>
+          <div class="row mt-2">
+              <div class="col-md-3"><label>Mobile Phone</label></div>
+              <div class="col-md-4">
+                  {% bootstrap_field profile_form.telephone_code show_label=false %}
+                  {% bootstrap_field profile_form.telephone_mobile show_label=false %}
+              </div>
+          </div>
+          {% if perms.accounts.change_user %}
+              <div class="row mt-2">
+                  <div class="col-md-3">
+                      <input id="submitbtn" type="submit" class="btn btn-primary btn-lg btn-block" value="Save">
+                  </div>
+              </div>
+          {% endif %}
+      </form>
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/intlTelInput.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            var inputPhone = document.querySelector("#id_telephone_mobile");
+            var countryCode = $('#id_telephone_code').val();
+            intlTelInput(inputPhone, {
+              separateDialCode: true,
+              initialCountry: 'auto'
+            });
+            inputPhone.addEventListener("countrychange", function() {
+              var code = $(this).parent().find('.selected-flag')[0].title.split(': ')[1];
+              $(this).parent().find('.selected-dial-code').html(code);
+              $('#id_telephone_code').val(code.replace('+',''));
+            });
+            $.get('https://ipinfo.io', function() {}, "jsonp").always(function(resp) {
+              var countryCode = (resp && resp.country) ? resp.country : "";
+              countryCode = countryCode.toLocaleLowerCase();
+              phoneCode = $('.country-list li[data-country-code=' + countryCode + ']').attr('data-dial-code');
+              var telephoneCode = $('#id_telephone_code').val();
+              if(telephoneCode){
+                countryCode = $('.country-list li[data-dial-code=' + telephoneCode + ']').attr('data-country-code');
+                phoneCode = telephoneCode;
+              }
+              $('#id_telephone_code').parent().find('.intl-tel-input').addClass('iti-sdc-3');
+              $('#id_telephone_code').parent().find('.selected-flag').attr('title', '+' + phoneCode);
+              $('#id_telephone_code').parent().find('.selected-flag .iti-flag').addClass(countryCode);
+              $('#id_telephone_code').parent().find('.selected-flag .selected-dial-code').html('+' + phoneCode);
+            });
+        });
+    </script>
+{% endblock %}

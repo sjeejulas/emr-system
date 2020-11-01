@@ -1,0 +1,110 @@
+div img {
+    width: 100%;
+    min-height: 100%;
+}
+
+p {
+    font-size: 18px;
+}
+
+.credentialSection {
+    background-color: rgba(12, 12, 13, 0.1);
+}
+
+.credential {
+    font-size: 20px;
+    font-weight: bolder;
+}
+
+.btn-checkSetup {
+    margin-bottom: 50px;
+    box-shadow: 7px 6px #cfcfcf;
+    border-radius: 0;
+    font-size: 30px;
+    color: white;
+    background-color: #33aea0;
+    height: 60px;
+    width: 350px;
+}
+
+.btn-checkChangeSetup {
+    margin-bottom: 50px;
+    color: white;
+    background-color: #33aea0;
+}
+
+.btn-checkSetupAgain {
+    margin-bottom: 50px;
+    box-shadow: 7px 6px #cfcfcf;
+    border-radius: 0;
+    font-size: 30px;
+    color: white;
+    background-color: #33aea0;
+    height: 60px;
+    width: 260px;
+}
+
+.btn-amendDetails {
+    background-color: rgba(188, 188, 188, 0.4);
+    margin-top: 10px;
+    font-size: 20px;
+    color: #2b2b2b;
+    border-radius: 0;
+}
+
+.btn-reviewInstructions {
+    margin-top: 10px;
+    font-size: 20px;
+    border-radius: 0;
+}
+
+
+.checkingEmis {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.pendingCheck {
+    background-color: #a2a2a2;
+}
+
+
+.failSetupEmisModal {
+    background-color: #faec89;
+    border-radius: 0rem !important;
+    border: 0px;
+    color: black;
+    width: 720px;
+}
+
+#organisationCode {
+    color: black;
+    font-size: larger;
+    font-weight: bold;
+}
+
+.failSetupEmisMessage {
+    color: #585858;
+}
+
+.emr-setup-card {
+    position:relative;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-box-direction:normal;
+    -ms-flex-direction:column;
+    flex-direction:column;
+    min-width:0;
+    word-wrap:break-word;
+    background-color:#fff;
+    background-clip:border-box;
+    border:1px solid rgba(0,0,0,.125);
+    border-radius:.25rem
+}
+
+.setup-caption {
+    position: absolute;
+    width: 50%;
+    bottom: 50%;
+}

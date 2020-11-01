@@ -1,0 +1,47 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div class="container callout callout--no-padding">
+    <div class="row">
+        <div class="col">
+            <h6 class="callout__header">
+                Bloods {% comment %} {% if instruction_type == 'AMRA' %} (for the last 5 years) {% endif %} {% endcomment %} 
+                <span></span>
+            </h6>
+        </div>
+    </div>
+    <div class="">
+        <div class="">
+            {% if not results %}
+            <div class="callout__content">
+                <p>No blood tests</p>
+            </div>
+            {% else %}
+                <div class="table-scrollable">
+                    <table class="value-event-table table-striped">
+                        <tbody>
+                            {% for key, value in results.items %}
+                            <tr class="value-event-table__cell-row">
+                                <th class="value-event-table__header">{{ key|bloods_type_value_header }}</th>
+                                {% for event in value %}
+                                <td class="value-event-table__cell">{{ event|event_value_body|safe }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+            <br>
+            <div class="container">
+            <label class="redaction-additional-header" for="redaction_bloods_notes">
+                Additional contextual information
+            </label>
+            <textarea placeholder="Further information related to this section" name="redaction_bloods_notes" 
+                    id="redaction_bloods_notes">{{ redaction.bloods_notes|default:"" }}</textarea>
+            <button type="submit" class="btn btn-primary float-right update_report_btn">Update</button>
+            <br>
+            <br>
+            </div>
+        </div>
+    </div>
+</div>

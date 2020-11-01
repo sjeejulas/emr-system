@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load instruction_templatetags %}
+{% load get_permissions %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+     <!-- Jquery DataTables -->
+    <link rel="stylesheet" href="{% static 'css/dataTables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/instructions/pipeline_views_instructions.css' %}">
+    <link href="{% static 'css/bootstrap-datepicker.min.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block Content %}
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row" >
+            <div class="col-md-4 offset-md-8">
+                <input id="search" name="search" type="search" placeholder="Search" class="form-control search">
+            </div>
+        </div>
+        <div class="row overall-number">
+            <div class="col-md-12">
+                {% for k, v in overall_instructions_number.items %}
+                    <div class="number" id="{{ k|cut:' ' }}">
+                        <a href="#" onclick="instructionStatusFilter('{{ k }}', 'payment');" class="ml-2 mr-2 mb-0">{{ k }} ({{ v }})</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <!--
+                    <select class="form-control">
+                        <option>Bulk Action</option>
+                        <option>Tiny Action</option>
+                    </select>
+                -->
+            </div>
+            <div class="col-md-3">
+                <!--{% bootstrap_button 'Apply' button_type="button" button_class="btn-primary"%} -->
+            </div>
+            <div class="col-md-5">
+                <div class="row">
+
+                        {% csrf_token %}
+                        {% bootstrap_field date_range_form.from_date  form_group_class='col-md-5 p-0 input-group dob' show_label=False %}
+                        {% bootstrap_field date_range_form.to_date   form_group_class='col-md-5 input-group dob' show_label=False %}
+                        {% bootstrap_button 'Search' button_type="submit" button_class="btn-primary"  %}
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select class="form-control" id="filterInstructionType" onchange="typeFilter('payment');">
+                    <option value="allType">All Types</option>
+                    <option value="AMRA">AMRA</option>
+                    <option value="SARS">SARS</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                {% render_table table 'django_tables2/bootstrap.html' %}
+                {% bootstrap_pagination  page=table.page pages_to_show=5 size='small' %}
+            </div>
+        </div>
+        <div class="modal fade" id="feeNoteModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg bg-info">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="container">
+                            <div class="col-12 mt-2">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <th>Surgery Name: </th>
+                                            <td id="surgeryName"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Surgery Address: </th>
+                                            <td id="surgeryAddress"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Client Name: </th>
+                                            <td id="clientName"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Client Ref: </th>
+                                            <td id="clientRef"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Patient Name: </th>
+                                            <td id="patientName"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Medi Ref: </th>
+                                            <td id="mediRef"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Date instruction received: </th>
+                                            <td id="RecievedDate"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Date instruction completed: </th>
+                                            <td id="CompletedDate"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>GP fee: </th>
+                                            <td id="gpFee"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Date of Fee Note: </th>
+                                            <td id="noteDate"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/dataTables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/dataTables/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/instructions/instruction_views.js' %}"></script>
+    <script src="{% static 'js/instructions/new_instruction.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#instructionsTable').DataTable();
+            $('.dataTables_filter, .dataTables_info, .dataTables_paginate, .dataTables_length').hide();
+            $('th.gp_practice > a').text('GP Practice');
+            $('th.gp_practice > a').click(false);
+
+            $("<li class='page-item {{ next_prev_data|keyvalue:'prev_disabled' }}'><a class='page-link'" +
+                "href='{% url 'instructions:view_pipeline' %}?page={{ next_prev_data|keyvalue:'prev_page' }}&status={{ next_prev_data|keyvalue:'status' }}&type={{ next_prev_data|keyvalue:'type' }}'>&lt;</a>/li").insertAfter('.prev');
+            $("<li class='page-item {{ next_prev_data|keyvalue:'next_disabled' }}'><a class='page-link'" +
+                "href='{% url 'instructions:view_pipeline' %}?page={{ next_prev_data|keyvalue:'next_page' }}&status={{ next_prev_data|keyvalue:'status' }}&type={{ next_prev_data|keyvalue:'type' }} '>&gt;</a></li>").insertBefore('.last');
+
+            $('input.search').on('keyup click', function () {
+                filterGlobal();
+            } );
+
+            $('.pager').hide();
+
+            if(getUrlParameter('type')){
+                $('#filterInstructionType').val(getUrlParameter('type'));
+            }
+
+            $('.checkbox').each(function () {
+                $(this).html('<input type="checkbox">');
+            });
+
+            $("th input:checkbox").click(function(){
+                $('input:checkbox').not(this).prop('checked', this.checked);
+            });
+
+            $(".page-link").each(function () {
+                this.href = this.href + '&type=' + getUrlParameter('type') + '&status=' + getUrlParameter('status');
+            });
+
+            $('th a').click(function(e) {
+                e.preventDefault();
+            });
+
+            $('.noteDetailButton').click(function () {
+                $('#surgeryName').text($(this).data('surgeryname'));
+                $('#surgeryAddress').text($(this).data('surgeryaddress'));
+                $('#clientName').text($(this).data('clientname'));
+                $('#clientRef').text($(this).data('clientref'));
+                $('#patientName').text($(this).data('patientname'));
+                $('#mediRef').text($(this).data('mediref'));
+                $('#RecievedDate').text($(this).data('receiveddate'));
+                $('#CompletedDate').text($(this).data('completeddate'));
+                $('#gpFee').text($(this).data('gpfee'));
+                $('#noteDate').text($(this).data('completeddate'));
+                $('#feeNoteModal').modal();
+            });
+
+            var start = new Date(1900, 1, 1);
+            var end = new Date();
+
+            $('#id_from_date').datepicker({
+                clearBtn: true,
+                startDate : start,
+                endDate   : end,
+                autoclose : true,
+                format: 'dd/mm/yyyy',
+            }).on('changeDate', function(){
+                if($(this).val()){
+                    $('#id_to_date').datepicker('setStartDate', new Date(reformatted_date($(this).val())));
+                }else {
+                    $('#id_to_date').datepicker('setStartDate', start);
+                }
+            });
+
+            $('#id_to_date').datepicker({
+                clearBtn: true,
+                startDate : start,
+                endDate   : end,
+                autoclose : true,
+                format: 'dd/mm/yyyy',
+            }).on('changeDate', function(){
+                if($(this).val()){
+                    $('#id_from_date').datepicker('setEndDate', new Date(reformatted_date($(this).val())));
+                }else {
+                    $('#id_from_date').datepicker('setEndDate', end);
+                }
+            });
+        });
+    </script>
+{% endblock %}

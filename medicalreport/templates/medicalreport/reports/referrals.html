@@ -1,0 +1,23 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+{% load final_report_tags %}
+<div style="display:flex;background-color:#235597;margin:0;">
+    <label class="header-medical-section">Referrals</label>
+</div>
+<div></div>
+{% if referrals %}
+    <table style="width:100%;font-size:15px;margin-top:10px;">
+        {% for model in referrals %}
+            {% with header=model|general_header:toolbox_params body=model|referral_body:locations  %} 
+                <tr>
+                    <td>{{ header }}{{ body }}</td>
+                </tr>
+            {% endwith %}
+        {% endfor %}
+        {% if redaction.referral_notes|default:"" %}
+            <tr>
+                <td><label style="font-weight:bold;">Additional contextual information</label> : {{redaction.referral_notes}}</td>
+            </tr>
+        {% endif %}
+    </table>
+{% endif %}

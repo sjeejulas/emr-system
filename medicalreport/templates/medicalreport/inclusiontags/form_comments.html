@@ -1,0 +1,19 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div class="container callout callout--no-padding">
+    <div class="row">
+        <div class="col">
+            <h6 class="callout__header">
+                Add any additional comments
+                <span></span>
+            </h6>
+        </div>
+    </div>
+    <div class="row callout__content">
+        <div class="container">
+            <textarea placeholder="Additional information" 
+                      name="redaction_comment_notes" id="redaction_comment_notes">{{ comment_notes|default:"" }}</textarea>
+            <button type="submit" class="btn btn-primary float-right update_report_btn">Update</button>
+        </div>
+    </div>
+</div>

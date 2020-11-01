@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link href="{% static 'css/sign-in.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block PageContent %}
+    <div class="outer">
+        <div class="middle">
+            <div class="inner text-center">
+                {% if request.get_host == mdx_url %}
+                    <img class="mt-4 mb-4 w-75 medi-logo" src="{% static 'images/logo/mdX_med.png' %}">
+                {% else %}
+                    <img class="mt-4 mb-4 w-75 medi-logo" src="{% static 'images/logo/eMR_med.png' %}">
+                {% endif %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+                    <label for="inputEmail" class="sr-only">Email address</label>
+                    {% bootstrap_field form.username show_help=True show_label=False %}
+                    {% bootstrap_field form.password show_label=False %}
+                    <div class="text-right mb-4">
+                        <a href="{% url 'accounts:password_reset' %}">Forgot your password?</a>
+                    </div>
+                    <div class="terms-policy mb-3">
+                        <button id="MediTerms" type="button">Terms & Conditions</button>
+                        <button id="MediPolicy" type="button">Data Policy</button>
+                    </div>
+                    <button class="btn btn-lg btn-primary btn-block " type="submit" id="loginBtn">LOGIN</button>
+                    <p class="mt-3 mb-3 text-muted">&copy; 2019</p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="MediTermsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="container">
+                        <div class="col-lg-12 col-md-12 col-sm-12 text-center">
+                            <div class="modal-dialog-pdf">
+                                <iframe id="mediterms_pdf" src="" style="width: 100%; height: 100%;" frameborder="0">
+                                    <p>It appears your web browser doesn't support iframes.</p>
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="MediPolicyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="container">
+                        <div class="col-lg-12 col-md-12 col-sm-12 text-center">
+                            <div class="modal-dialog-pdf">
+                                <iframe id="medipolicy_pdf" src="" style="width: 100%; height: 100%;" frameborder="0">
+                                    <p>It appears your web browser doesn't support iframes.</p>
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock PageContent %}
+{% block Script %}
+  <script>
+      $('#MediTerms').on('click', function(){
+          if("{{ request.get_host }}" == "{{ mdx_url }}"){
+              if("{{ request.get_host }}".indexOf("demo") >= 0){
+                  $('#mediterms_pdf').attr('src', "{% static 'documents/ClientTermAndConditions[DEMO].pdf' %}");
+              } else if("{{ request.get_host }}".indexOf("dev") >= 0){
+                  $('#mediterms_pdf').attr('src', "{% static 'documents/ClientTermAndConditions[DEV].pdf' %}");
+              } else {
+                  $('#mediterms_pdf').attr('src', "{% static 'documents/ClientTermAndConditions.pdf' %}");
+              }
+          } else {
+              if("{{ request.get_host }}".indexOf("demo") >= 0){
+                  $('#mediterms_pdf').attr('src', "{% static 'documents/TermAndConditions[DEMO].pdf' %}");
+              } else if("{{ request.get_host }}".indexOf("dev") >= 0){
+                  $('#mediterms_pdf').attr('src', "{% static 'documents/TermAndConditions[DEV].pdf' %}");
+              } else {
+                  $('#mediterms_pdf').attr('src', "{% static 'documents/TermAndConditions.pdf' %}");
+              }
+          }
+          $('#MediTermsModal').modal("show");
+      });
+      $('#MediPolicy').on('click', function(){
+          $('#medipolicy_pdf').attr('src', "{% static 'documents/DataPolicy.pdf' %}");
+          $('#MediPolicyModal').modal("show");
+      });
+  </script>
+{% endblock %}

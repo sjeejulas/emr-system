@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+
+{% block ExtraHead %}
+    <link href="{% static 'css/onboarding/emis_setup.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'assets/fancybox/jquery.fancybox.min.css' %}" />
+{% endblock %}
+
+{% block Content %}
+{% include 'onboarding/progress_bar_onboard.html' %}
+<div class="col-12">&nbsp;</div>
+    <div class="modal fade" id="surgeryUpdateModal">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body mt-3 p-4">
+                    <form id="updateSurgeryform" method="POST">
+                        {% csrf_token %}
+                        <div class="row form-group">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-5 title-pos">Surgery Name</div>
+                                    {% bootstrap_field surgery_update_form.surgery_name %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-4 title-pos">Practice Code</div>
+                                    {% bootstrap_field surgery_update_form.surgery_code %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-5 title-pos">Emis Organisation Code</div>
+                                    {% bootstrap_field surgery_update_form.emis_org_code %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-4 title-pos">Primary care record system</div>
+                                    <div class="col-md-8 pl-0">
+                                        {% bootstrap_field surgery_update_form.operating_system %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-md-6">
+                                <a class="btn btn-secondary" href="{% url 'onboarding:step3' practice_code=practice_code %}">Go Back to EMIS Setup</a>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-primary float-md-right mr-3">Update Details</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="failSetupEmisModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content failSetupEmisModal alert-warning">
+                <div class="row p-3">
+                    <div class="col-md-12">
+                        <h2>
+                            Oh dear!
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </h2>
+
+                        <p class="failSetupEmisMessage">
+                            Something's not quite right. We can't seem to reach your EMISweb surgery profile.
+                            Please double-check the above steps and your EMIS organisation code (top of EMISweb):
+                        </p>
+                        <p class="failSetupEmisMessage">
+                            Expected EMIS Organisation Code: <span id="organisationCode">{{ organisation_code }}</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="row pl-3 pr-3 pb-3">
+                    <div class="col-md-3">
+                        <button class="btn btn-amendDetails" type="button" id="amendButton">
+                            <i class="fas fa-chevron-left"></i><span class="">&nbsp; Amend Details</span>
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-reviewInstructions ml-1" data-dismiss="modal" type="button">
+                             Review Instructions
+                        </button>
+                    </div>
+                    <div class="col-md-6 checkingEmisAgain">
+                        <button class="btn btn-checkSetupAgain mb-1 ml-5" type="button">
+                            <i class="fas fa-question"></i>&nbsp; Check Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="step1-block">
+        {% include 'onboarding/emr_setup_step1.html' %}
+    </div>
+    <div id="step2-block" class="another-block">
+        <div class="col-12">&nbsp;</div>
+        {% include 'onboarding/emr_setup_step2.html' %}
+    </div>
+    <div id="step3-block" class="another-block">
+        <div class="col-12">&nbsp;</div>
+        {% include 'onboarding/emr_setup_step3.html' %}
+    </div>
+    <div id="step4-block" class="another-block">
+        <div class="col-12">&nbsp;</div>
+        {% include 'onboarding/emr_setup_step4.html' %}
+    </div>
+
+    <div class="col-12">&nbsp;</div>
+    <div id="main-btn-block">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h6 class="text-danger">** Note : You can click image for preview mode. **</h6>
+            </div>
+            <div class="col-md-2 offset-md-4">
+                <button type="button" class="btn-block btn btn-secondary btn-lg" id="backBTN" onClick="changeAttr('back')">
+                    <i class="fas fa-angle-left"></i>&nbsp;&nbsp;Back
+                </button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn-block btn btn-success btn-lg" id="nextBTN" onClick="changeAttr('next')">
+                    Next&nbsp;&nbsp;<i class="fas fa-angle-right"></i>
+                </button>
+            </div>
+            <div class="col-md-3 offset-md-1">
+                <button type="button" class="btn-block btn btn-primary btn-lg" id="completeBTN" disabled>
+                    <i class="fas fa-check"></i>&nbsp;&nbsp;&nbsp;Step 1 : Complete
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="secon-btn-block" class="another-block">
+        <div class="col-12">
+            <h6 class="text-danger">If you miss any steps or need to review again, <br> you can go back to the beginning here.</h6>
+        </div>
+        <div class="col-3 mt-3">
+            <form method="GET" id="refreshForm">
+                <button type="submit" class="btn-block btn btn-primary btn-lg" id="refreshBtn">
+                    <i class="fas fa-redo-alt"></i>&nbsp;&nbsp;&nbsp;Start Again.
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/onboarding/emis_setup.js' %}"></script>
+    <script src="{% static 'assets/fancybox/jquery.fancybox.min.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $('.top-progress').css({
+                'position': 'relative',
+                'right': '0px',
+                'width': '100%',
+            });
+            $(document).scroll(function () {
+                if($(document).scrollTop() == 0){
+                    $('.top-progress').css({
+                        'position': 'relative',
+                        'right': '0px',
+                        'width': '100%',
+                    });
+                } else {
+                    $('.top-progress').css({
+                        'position': 'fixed',
+                        'right': '-15px',
+                        'width': '86%',
+                    });
+                }
+            });
+            $('.js-tooltip').tooltip();
+
+            $('.js-copy').click(function() {
+                var text = $(this).attr('data-copy');
+                var el = $(this);
+                copyToClipboard(text, el);
+            });
+
+            $('.checkingEmisAgain').click(function () {
+                $('#failSetupEmisModal').modal('hide');
+                $('#checkingEmisButton').trigger('click');
+            });
+
+            $('#amendButton').click(function () {
+                $('#failSetupEmisModal').modal('hide');
+                $('#surgeryUpdateModal').modal({
+                    backdrop: "static"
+                });
+            });
+
+            //  set default progress bar
+            {% if reload_status == 1 %}
+                fromReload();
+            {% else %}
+                $('#progress_percent').text('35%');
+                $('#progress_bar').attr('aria-valuenow', '35');
+                $('#progress_bar').css('width', '35%');
+            {% endif %}
+
+            validateBTN( $('#progress_bar').attr('aria-valuenow') );
+
+            $('#completeBTN').click( function() {
+                var percentNow = parseInt( $('#progress_bar').attr('aria-valuenow') );
+                switch( percentNow ) {
+                    case 51:
+                        $('#id_label').removeClass('text-danger');
+
+                        $('#id_label').addClass('text-warning');
+
+                        $('#completeBTN').html('<i class="fas fa-check"></i>&nbsp;&nbsp;&nbsp;Step 2 : Complete');
+                        $('#step2-block').show();
+                        $('#nextBTN').trigger('click');
+                        break;
+                    case 63:
+                        $('#completeBTN').html('<i class="fas fa-check"></i>&nbsp;&nbsp;&nbsp;Step 3 : Complete');
+                        $('#step3-block').show();
+                        $('#nextBTN').trigger('click');
+                        break;
+                    case 83:
+                        $('#id_label').removeClass('text-warning');
+
+                        $('#id_label').addClass('text-success');
+
+                        $('#completeBTN').html('<i class="fas fa-check"></i>&nbsp;&nbsp;&nbsp;Step 4 : Complete');
+                        $('#step4-block').show();
+                        $('#nextBTN').trigger('click');
+
+                        $('#main-btn-block').hide();
+                        $('#secon-btn-block').show();
+                        break;
+                }
+                $('#completeBTN').prop('disabled',true);
+            });
+        });
+
+    </script>
+{% endblock %}

@@ -1,0 +1,66 @@
+.btn-requestCode {
+    color: white;
+    background-color: #b391b5;
+    border-color: #0a0a0a;
+    border-radius: 11px;
+    border-width: 2px;
+    width: 165px;
+}
+
+.btn-accessCode {
+    color: white;
+    background-color: #83bbe6;
+    border-color: #0a0a0a;
+    border-radius: 11px;
+    border-width: 2px;
+    width: 165px;
+}
+
+.btn-downloadReport {
+    color: black;
+    background-color: #FEDF60;
+    border-color: #0a0a0a;
+    border-radius: 11px;
+    border-width: 2px;
+    width: 165px;
+}
+
+.btn-printReport {
+    color: black;
+    background-color: #e5e5e5;
+    border-color: #0a0a0a;
+    border-radius: 11px;
+    border-width: 2px;
+    width: 165px;
+}
+
+.report-messages {
+    color: #000000d1;
+    font-size: 18px;
+    padding-left: 3rem!important;
+    margin-left: 3rem!important;
+    margin-top: 1rem!important;
+}
+
+.btn-authorisation {
+    color: black;
+    background-color: #a2d977;
+    border-color: #0a0a0a;
+    border-radius: 11px;
+    border-width: 2px;
+    width: 177px;
+}
+
+.btn-cancelAuthorisation {
+    color: black;
+    background-color: #fe8f80;
+    border-color: #0a0a0a;
+    border-radius: 11px;
+    border-width: 2px;
+    width: 177px;
+}
+
+#thirdPartyForm {
+    color: #000000d1;
+    font-size: 18px;
+}

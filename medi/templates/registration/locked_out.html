@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+
+{% block Content %}
+    <div>
+        <div class="card">
+            <div class="card-header alert-danger">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Your IP repeated login attempts over limit.</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row subheader">
+                    <div class="col-12">
+                        <span>If you have any queries please email us on emr@medi2data.com or contact our support team on 03333 0 55774</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

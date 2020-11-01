@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link href="{% static 'css/accounts/view_account.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/onboarding/emis_setup.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/instructions/new_instruction.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/pretty-checkbox.min.css' %}">
+{% endblock %}
+
+{% block Content %}
+    <div class="card-deck instruction">
+        <form method="POST" id="preferencesForm" action="{% url 'accounts:view_account' %}" class="col-md-12 px-0">
+            {% csrf_token %}
+
+            {% if organisation_fee_data %}
+                {% if perms.instructions.authorise_bank_account or perms.instructions.amend_bank_account %}
+                    <div id="bank_detail_block">
+                        <div class="card contactPreferences mt-4">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Bank Details for Fee Payments</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">Bank Account Name</div>
+                                    <div class="col-md-4">
+                                        {% bootstrap_field bank_details_form.payment_bank_holder_name placeholder='' %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">Bank Account Number</div>
+                                    <div class="col-md-4">
+                                        {% bootstrap_field bank_details_form.payment_bank_account_number placeholder='' %}
+                                        <div class="invalid-feedback">
+                                            <label id="invalid_bank_number" style="display:none">The account number is too short, as it must be eight digits long.</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">Bank Account Sort Code</div>
+                                    <div class="col-md-4">
+                                        {% bootstrap_field bank_details_form.payment_bank_sort_code placeholder='' %}
+                                        <div class="invalid-feedback">
+                                            <label id="invalid_sort_code" style="display:none">The sort code is too short, as it must be six digits long.</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if perms.instructions.amend_bank_account %}
+                                    <div class="row">
+                                        <div class="col-md-5">
+                                            <button class="btn btn-primary" id="update_bank_details" type="button">
+                                                Update Bank Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if perms.instructions.authorise_fee or perms.instructions.amend_fee %}
+                    <div class="card contactPreferences mt-4">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Practice Fee Income</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="col-md-12 OrgaisationFee">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mt-2 mb-3">
+                                            <h6 ><b>Fees</b></h6>
+                                        </div>
+                                        <div class="mt-2 mb-4">
+                                            Your fees depend on the speed in which you're able to return the medical report. Your agreed fee levels are shown below. To discuss different fee levels, please contact a member of the Medidata team.
+                                        </div>
+                                    </div>
+                                </div>
+                                {% for data in organisation_fee_data %}
+                                    <div class="row FeeLevel">
+                                        <div class="col-md-3 rowTitle">
+                                        {{ data.label }}
+                                        </div>
+                                        <div class="col-md-9">
+                                            <div class="row">
+                                                <input type="text" class="form-control currency display-inline" value="£" readonly="true">
+                                                {% if perms.instructions.amend_fee and forloop.counter == 1 %}
+                                                <select name="organisation_fee_id" id="first_fee" class="form-control feeData" title="">
+                                                    {% for band_fee in band_fee_rate_data %}
+                                                    <option value="{{ band_fee.0 }}" {% if band_fee.0 == data.pk %}selected{% endif %}>{{ band_fee.1 }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                {% else %}
+                                                <input type="text" id="fee_within_{{ data.days }}" class="form-control feeData display-inline" value="{{ data.amount }}" readonly="true">
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+                <div class="card contactPreferences mt-4">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Settings</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h4>Generate new password</h4>
+                        <p>Please use new password that was generated to setup on EMAS then click check setup button to check it all ready</p>
+                        <div class="row mt-4">
+                            <div class="col-md-5">
+                                <button class="btn btn-primary" type="submit" value="generate-password">
+                                    Generate New Organisation Password
+                                </button>
+                            </div>
+                            {% if new_password %}
+                                <div class="col-md-12 mt-3">
+                                    <p> Your organisation password has changed.</p>
+                                    <p> Your organisation cannot access EMIS until you finish your new password setup on EMAS</p>
+                                    <p id="password">
+                                    New Password:&nbsp; <span class="credential pr-2" style="background-color: gainsboro;">&nbsp; {{ new_password }}</span>
+                                    <button type="button" class="btn btn-default btn-copy js-tooltip js-copy" data-toggle="tooltip" data-placement="bottom" data-copy="{{ new_password }}" title="Copy to clipboard">
+                                        <i class="fas fa-copy fa-2x"></i>
+                                    </button>
+                                    Click icon to copy the password
+                                </p>
+                                </div>
+                                <div class="col-md-12">
+                                    <p>When you finished your setup you can check it by click on Check Setup button</p>
+                                    <button class="btn btn-checkChangeSetup mb-0" onclick="this.disabled=true; pollingNewEmis('{% url "onboarding:emis_polling" practice_code %}')" type="button" id="checkingEmisButton">
+                                        <i class="fas fa-question"></i>&nbsp; Check Setup
+                                    </button>
+                                    <div class="emisSetupFail d-none">
+                                        <pre> <span style="color: red; font-size: 25px"><i class="fas fa-times"></i>  Fail!</span></pre>
+                                    </div>
+                                    <div class="emisSetupSuccess d-none">
+                                        <pre> <span style="color: #33aea0; font-size: 25px"><i class="fas fa-check"></i>  SUCCESS!</span></pre>
+                                    </div>
+                                </div>
+                             {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/onboarding/emis_setup.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('.js-tooltip').tooltip();
+
+            $('.js-copy').click(function() {
+                var text = $(this).attr('data-copy');
+                var el = $(this);
+                copyToClipboard(text, el);
+            });
+
+            $('#update_bank_details').click(function() {
+                $.ajax({
+                    url: $('#update_bank_details').attr("action"),
+                    type: 'POST',
+                    data: $('#preferencesForm').serialize()+'&update_bank_details=1'
+                }).done(function(response) {
+                    create_alert(response['message'], 'success');
+                }).fail(function() {
+                    create_alert('Something went wrong, please try again.', 'error');
+                });
+            });
+
+            var band_fee_rate_data = {{ band_fee_rate_data }};
+            $('#first_fee').on('change', function () {
+                {% for data in organisation_fee_data %}
+                    {% if forloop.counter != 1 %}
+                    $('#fee_within_{{ data.days }}').val(Number(band_fee_rate_data.filter(function(band_fee) { return band_fee[0] == $('#first_fee').val(); })[0][{{ forloop.counter }}]).toFixed(2));
+                    {% endif %}
+                {% endfor %}
+                $.ajax({
+                    url: "{% url 'accounts:view_account' %}",
+                    type: 'POST',
+                    data : $('#preferencesForm').serialize()+"&is_fee_changed=1"
+                })
+                .done(function(){
+                    create_alert('Notification setting has been changed.', 'success');
+                })
+                .fail(function(){
+                    create_alert('Something went wrong, please try again.', 'error');
+                });
+            });
+            $("#first_fee > option").each(function() {
+                $(this).text(Number(this.text).toFixed(2));
+            });
+
+            {% if not perms.instructions.amend_bank_account %}
+                $('#id_payment_bank_holder_name').prop('disabled', true);
+                $('#id_payment_bank_account_number').prop('disabled', true);
+                $('#id_payment_bank_sort_code').prop('disabled', true);
+            {% endif %}
+
+            // Check range sortcode - bank Number
+            $('#id_payment_bank_sort_code').change( function() {
+                var sort_code_value = $('#id_payment_bank_sort_code').val();
+                if(sort_code_value.length < 6) {
+                    $('#id_payment_bank_sort_code').addClass('is-invalid');
+                    $('#invalid_sort_code').show();
+                } else {
+                    $('#id_payment_bank_sort_code').removeClass('is-invalid');   
+                    $('#invalid_sort_code').hide();
+                }
+            });
+
+            $('#id_payment_bank_account_number').change( function() {
+                var bank_number_value = $('#id_payment_bank_account_number').val();
+                if(bank_number_value.length < 8){
+                    $('#id_payment_bank_account_number').addClass('is-invalid');
+                    $('#invalid_bank_number').show();
+                } else {
+                    $('#id_payment_bank_account_number').removeClass('is-invalid');   
+                    $('#invalid_bank_number').hide();
+                }
+            });
+        });
+    </script>
+{% endblock %}

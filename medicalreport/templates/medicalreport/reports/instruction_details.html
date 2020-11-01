@@ -1,0 +1,23 @@
+<div style="display:flex;background-color:#235597;margin:0;">
+    <label class="header-medical-section">Instruction Details</label>
+</div>
+<table style="width:100%;font-size:15px;margin-top:10px;">
+    <tr>
+        <td style="width:20%;font-weight:bold;">Requesting Party</td>
+        <td style="width:80%;">{{instruction.client_user.user.get_full_name}}</td>
+    </tr>
+    <tr>
+        {% if instruction.type == 'AMRA'  %}
+            <td style="width:20%;font-weight:bold;font-size:13px;">Requested Conditions</td>
+            <td style="width:80%;font-size:13px;">
+                {% for snomed in instruction.selected_snomed_concepts %}
+                    {{snomed.fsn_description}}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            </td>
+        {% endif %}
+      </tr>
+    <tr>
+        <td style="width:20%;font-weight:bold;">Reference Number</td>
+        <td style="width:80%;">{{instruction.medi_ref}}</td>
+    </tr>
+</table>

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% load account_tag %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link href="{% static 'css/sign-in.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block PageContent %}
+    <div class="outer">
+        <div class="middle">
+            <div class="inner text-center">
+                {% if request.get_host == 'https://mdx.medi2data.com' %}
+                    <img class="mt-4 mb-4 w-75 medi-logo" src="{% static 'images/logo/mdX_med.png' %}">
+                {% else %}
+                    <img class="mt-4 mb-4 w-75 medi-logo" src="{% static 'images/logo/eMR_med.png' %}">
+                {% endif %}
+                <form action="{% url 'accounts:two_factor' %}" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h5 class="mb-3 font-weight-normal">OTP sent to number +{{ user.userprofilebase.telephone_code }} {{ user.userprofilebase.telephone_mobile|sensor_phone }}</h5>
+                    {% bootstrap_form form layout='inline' %}
+                    <button class="btn btn-lg btn-primary btn-block " type="submit">LOGIN</button>
+                    <p class="mt-5 mb-3 text-muted">&copy; 2017-2018</p>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock PageContent %}

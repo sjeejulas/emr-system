@@ -1,0 +1,31 @@
+{% load bootstrap4 %}
+{% bootstrap_css %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            .header-medical-section {
+                color:white;
+                font-size:20px;
+                display: block;
+                padding: 10px;
+                padding-bottom: 0px;
+                margin-bottom: 15px;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="display:flex;background-color:#235597;margin:0;">
+				    <label class="header-medical-section">Unsupported attachments</label>
+        </div>
+        <table style="width:100%;font-size:15px;margin-top:10px;">
+            {% for attachment in attachments %}
+                <tr>
+                    <td>{{attachment}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

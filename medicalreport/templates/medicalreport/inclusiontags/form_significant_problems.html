@@ -1,0 +1,43 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div class="container callout callout--no-padding">
+    <div class="row">
+        <div class="col">
+            <h6 class="callout__header">
+                Significant Conditions
+                <span></span>
+            </h6>
+        </div>
+    </div>
+    <div class="row callout__content">
+        <div class="container">
+            <h6 class='header'>Active</h6>
+            <div>
+            {% for model in significant_active_problems %}
+            {% with header=model|active_problem_header:problem_linked_lists map_code=model|map_code %}
+                {% problem_redaction_checkboxes model redaction problem_linked_lists header word_library map_code sensitive_conditions section='significant_active' %}
+            {% endwith %}
+            {% endfor %}
+            </div>
+            <hr>
+            <h6 class='header'>Past</h6>
+            <div>
+            {% for model in significant_past_problems %}
+            {% with header=model|past_problem_header:problem_linked_lists map_code=model|map_code  %}
+                {% problem_redaction_checkboxes model redaction problem_linked_lists header word_library map_code sensitive_conditions section='significant_past' %}
+            {% endwith %}
+            {% endfor %}
+            </div>
+            <br>
+            <label class="redaction-additional-header" for="redaction_significant_problem_notes">
+                Additional contextual information / missing conditions
+            </label>
+            <textarea placeholder="Further information related to this section" 
+                      name="redaction_significant_problem_notes" id="redaction_significant_problem_notes">{{ redaction.significant_problem_notes|default:"" }}</textarea>
+            <div class="sensitive-information-instructions alert alert-warning">
+                <p>Should a 'Significant Condition' be redacted from this section, all references to it will be removed from the report. You can unredact at any time prior to submitting the final report.</p>
+            </div>
+            <button type="submit" class="btn btn-primary float-right update_report_btn">Update</button>
+        </div>
+    </div>
+</div>

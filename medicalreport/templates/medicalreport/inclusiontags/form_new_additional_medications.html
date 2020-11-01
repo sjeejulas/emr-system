@@ -1,0 +1,67 @@
+    <div class="">
+        <br>
+        <div class="row">
+            <div class="col">
+                <label for="additional_medication_records_type">*Acute or Repeat</label>
+                <div class="input-group mb-3">
+                    <select class="custom-select" id="additional_medication_records_type" name="additional_medication_records_type">
+                        <option value='' selected>Choose...</option>
+                        <option value="acute">Acute</option>
+                        <option value="repeat">Repeat</option>
+                    </select>
+                </div>
+                <label for="additional_medication_related_condition">Related to condition</label>
+                <div class="input-group mb-3">
+                    <select class="custom-select" id="additional_medication_related_condition" name="additional_medication_related_condition">
+                        <option value='' selected>Choose...</option>
+                        {% for snomed in instruction.selected_snomed_concepts %}
+                        <option value="{{ snomed.pk }}">{{ snomed.fsn_description }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <label for="additional_medication_drug">*Drug</label>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-input" aria-label="Small" aria-describedby="inputGroup-sizing-sm"
+                           id="additional_medication_drug" name="additional_medication_drug">
+                </div>
+                <label for="additional_medication_dose form-input">*Dose</label>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-input" aria-label="Small" aria-describedby="inputGroup-sizing-sm"
+                           id="additional_medication_dose" name="additional_medication_dose">
+                </div>
+                <label for="additional_medication_frequency">*Frequency</label>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-input" aria-label="Small" aria-describedby="inputGroup-sizing-sm"
+                           id="additional_medication_frequency" name="additional_medication_frequency">
+                </div>
+                <label for="additional_medication_prescribed_from">Prescribed from</label>
+                <div class="input-group mb-3">
+                    <input class="form-control form-input" data-provide="datepicker"
+                           id="additional_medication_prescribed_from" name="additional_medication_prescribed_from">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                    </div>
+                </div>
+                <label for="additional_medication_prescribed_to">Prescribed to</label>
+                <div class="input-group mb-3">
+                    <input class="form-control form-input" data-provide="datepicker"
+                           id="additional_medication_prescribed_to" name="additional_medication_prescribed_to">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                    </div>
+                </div>
+                <label class="redaction-additional-header" for="additional_medication_notes">
+                        Additional contextual information
+                    </label>
+                    <textarea placeholder="Further information related to this section" 
+                            name="additional_medication_notes" 
+                            id="additional_medication_notes"
+                            class="form-input">{{ redaction.additional_medication_notes }}
+                    </textarea>
+            </div>
+        </div>
+    </div>

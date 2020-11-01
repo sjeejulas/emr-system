@@ -1,0 +1,30 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div class="container callout callout--no-padding">
+    <div class="row">
+        <div class="col">
+            <h6 class="callout__header">
+                Additional Questions
+                <span></span>
+            </h6>
+        </div>
+    </div>
+    <div class="row callout__content">
+        <div class="container">
+        {% if questions %}
+            {% for q in questions %}
+                <div class="row mt-1">
+                    <div class="col-md-6">{{ q }}</div>
+                    <div class="col-md-6">
+                        <input class="w-75" name="answer-question-{{ q.pk }}" placeholder="Answer"
+                               value="{{ q.instructionadditionanswer.answer }}" type="text">
+                    </div>
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary mt-2 float-right update_report_btn">Update</button>
+        {% else %}
+            No addition questions.
+        {% endif %}
+        </div>
+    </div>
+</div>

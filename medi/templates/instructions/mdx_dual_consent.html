@@ -1,0 +1,100 @@
+{% load static %}
+{% load instruction_templatetags %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{% static 'css/instructions/consent_form.css' %}">
+        <title>MDX Dual Consent Form</title>
+    </head>
+    <body>
+        <div class="mdx-consent-style">
+            <div class="mdx-title">
+                <label><strong>Dual Consent Form for SARs</strong></label>
+            </div>
+            We can provide your medical records through a secure access portal operated by MediData Exchange Limited (<b>MediData</b>), which will provide you with electronic access to your medical records through an encrypted secure access portal. We will not provide your medical records through this secure access portal unless you consent to us doing so.<br> <br>
+
+            If you consent to your medical records being provided through the secure access portal, MediData will contact you directly to provide access to the secure access portal where your medical records will be made available in PDF format. <br><br>
+            
+            Where MediData need to provide you with access to the secure access portal, they will require your email address, and mobile telephone number to provide you with access by email and text. Please provide your <b>email address and MOBILE phone number here:</b> <br><br>
+            
+            <b>Please note that unless both fields are correctly completed, MediData will be unable to provide you with secure access to your medical information.</b><br><br>
+
+            <table style="font-size:16px; border: 1px solid black; ">
+                <tr>
+                    <td style="font-weight:bold;padding:5px 0 0 5px; width: 30%">Email Address</td>
+                    <td style="width: 70%;"></td>
+                </tr>
+                <tr>
+                    <td style="font-weight:bold;padding:5px 0 0 5px; width: 30%">Mobile Phone Number</td>
+                    <td style="width: 70%;"></td>
+                </tr>
+            </table>
+
+            I consent to you providing copies of my medical records through the secure access portal operated by MediData, and for MediData to contact me directly to provide access to the medical records requested through a secure <b>‘https://’ url</b> link. I acknowledge that if MediData contact me directly, they will use the contact details provided on this form.
+
+            <table style="font-size: 16px; margin-top: 20px; padding:0;">
+                <tr>
+                    <td style="width:12%; padding-left: 8px;">Tick box:</td>
+                    <td style="width:2.4%; padding-bottom: 5px;">
+                        <div style="border: 1px solid black; color:white; font-size:10px;">
+                            <label style="color:white;font-size:4px;">Tick</label>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            I consent to my medical records being stored, and to remain available on the secure access portal operated by MediData for a period of six (6) months after being first made available and that MediData can use my personal data to contact me by email and text message to: <br>
+            <ul>
+                <li>notify me that the six-month period that my medical records are held for is due to expire; and </li>
+                <li>request confirmation from me on whether the medical records should remain available through the secure access portal for longer than the initial six-month period.</li>
+            </ul>
+            <table style="font-size: 16px; margin-top: 20px; padding:0;">
+                <tr>
+                    <td style="width:12%; padding-left: 8px;">Tick box:</td>
+                    <td style="width:2.4%; padding-bottom: 5px;">
+                        <div style="border: 1px solid black; color:white; font-size:10px;">
+                            <label style="color:white;font-size:4px;">Tick</label>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            If you have consented to your medical records being provided through the secure access portal, you have the right to withdraw this consent at any time by notifying MediData by email:
+            <u>notifyus@medi2data.com</u>
+            <table style="font-size:16px; border: 1px solid black; margin-top: 25px;">
+                <tr>
+                    <td style="padding:5px 0 0 5px; width: 30%">Patient Signature:</td>
+                    <td style="width: 70%;"></td>
+                </tr>
+                <tr>
+                    <td style="padding:5px 0 0 5px; width: 30%">Patient Full Name:</td>
+                    <td style="padding:5px 0 0 5px; width: 70%;">{{ patient|patient_full_name }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:5px 0 0 5px; width: 30%">Dated:</td>
+                    <td style="width: 70%;"></td>
+                </tr>
+            </table>
+            <table style="font-size:16px; border: 1px solid black; margin-top: 20px;">
+                <tr>
+                    <td style="padding:5px 0 0 5px; width: 30%">GP surgery name and address:</td>
+                    <td style="padding:5px 0 0 5px; width: 70%;">{{ gp_practice|gp_surgery_full_name }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:5px 0 0 5px; width: 30%">Signed:</td>
+                    <td style="width: 70%;"></td>
+                </tr>
+                <tr>
+                    <td style="padding:5px 0 0 5px; width: 30%">Signed by:</td>
+                    <td style="width: 70%;"></td>
+                </tr>
+                <tr>
+                    <td style="padding:5px 0 0 5px; width: 30%">Dated:</td>
+                    <td style="width: 70%;"></td>
+                </tr>
+            </table>
+        </div>
+        <br>
+        <div class="foother-title">
+            MediData Exchange Limited   January 2019   v1
+        </div>
+    </body>
+</html>

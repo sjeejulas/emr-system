@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load medi_report_tags %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+
+{% block ExtraHead %}
+    <link rel="stylesheet" href="{% static 'css/intlTelInput.min.css' %}">
+    <link href="{% static 'css/sign-in.css' %}" rel="stylesheet">
+    <link href="{% static 'css/report/patient_report.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block PageContent %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3 mt-3">
+            <img class=" mb-3 w-75 h-100 medi-logo" src="{% static 'images/logo/eMR_med.png' %}">
+        </div>
+        <div class="col-md-12 mt-3">
+            <form  method="post" id="thirdPartyForm">
+                {% csrf_token %}
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Third party authorisation</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body pr-5">
+                        <p class="mt-2 mb-5">
+                            Please provide the details of the third party, such as your solicitor, who you wish to authorise.
+                            To keep your data secure, the individual you are authorising will need to provide a contact number,
+                            to be able to receive a code, as part of the two-factor authentication process.
+                        </p>
+                        <div class="col-md-12">
+                            <div class="row form-group">
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <div class="col-md-5 title-pos">Company <br>(if applicable)</div>
+                                        {% bootstrap_field third_party_form.company show_label=False form_group_class='col-md-7' placeholder='' %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <div class="col-md-5 title-pos">Contact Name </div>
+                                        {% bootstrap_field third_party_form.contact_name show_label=False form_group_class='col-md-7' placeholder='' %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <div class="col-md-5 title-pos">Case Reference <br>(if known) </div>
+                                        {% bootstrap_field third_party_form.case_reference show_label=False form_group_class='col-md-7' placeholder='' %}
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    Please include any reference number you have from your Solicitor. <br>
+                                    However if authorising a family member or friend please create your own reference number. <br>
+                                    Please make a note of this and keep it safe.
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <div class="col-md-5 title-pos">Email </div>
+                                        {% bootstrap_field third_party_form.email_1 show_label=False form_group_class='col-md-7' placeholder='' %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <div class="col-md-5 title-pos">Confirm Email </div>
+                                        {% bootstrap_field third_party_form.email_2 show_label=False form_group_class='col-md-7' placeholder='' %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <p class="font-weight-bold mt-4 mb-4">Two factor authentication.</p>
+                                    <div class="row form-group">
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="col-md-5 title-pos">Office Phone (for solicitor for example)</div>
+                                                {% bootstrap_field third_party_form.office_phone_number show_label=False form_group_class='col-md-7' placeholder='' %}
+                                                {% bootstrap_field third_party_form.office_phone_number_code %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="offset-8">
+                                                    <p>Or</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="col-md-5 title-pos">Mobile Phone (for family member)</div>
+                                                {% bootstrap_field third_party_form.family_phone_number show_label=False form_group_class='col-md-7' placeholder='' %}
+                                                {% bootstrap_field third_party_form.family_phone_number_code %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <p class="mt-4">
+                                        In order to secure your medical record, we require your authorised third party to
+                                        provide a contact number, so that they can receive a code to access.
+                                    </p>
+                                    <p>
+                                        If you are giving access to a third party like solicitor, please provide an office number.
+                                        They will receive an automated phone call.
+                                    </p>
+                                    <p>
+                                        If you are giving access to a family member or friend, for example, please provide their
+                                        mobile number. They will receive a text message with a code.
+                                    </p>
+                                    <p>
+                                        Please only complete one box.
+                                    </p>
+                                </div>
+                            </div>
+                            {% if third_party_form.non_field_errors %}
+                              <div class="non-field-errors">
+                                {% for err in third_party_form.non_field_errors %}
+                                  <p class="form-error ml-5" style="color: red;">{{ err }}</p>
+                                {% endfor %}
+                              </div>
+                            {% endif %}
+                            <div class="row mt-3 mb-5">
+                                <div class="col-md-2">
+                                    <a href="{% url 'report:select-report' access_type='patient' %}" class="btn btn-accessCode w-100"><i class="fas fa-chevron-left mr-2"></i>Go back</a>
+                                </div>
+                                <div class="col-md-2 w-50">
+                                    <input type="submit" value="Authorise" class="btn btn-authorisation w-100">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/intlTelInput.min.js' %}"></script>
+    <script src="{% static 'js/intlTel.js' %}"></script>
+    <script>
+        setUpTel("id_family_phone_number", "id_family_phone_number_code");
+        setUpTel("id_office_phone_number", "id_office_phone_number_code");
+    </script>
+{% endblock %}

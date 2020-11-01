@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load instruction_templatetags %}
+{% load get_permissions %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link rel="stylesheet" href="{% static 'css/errors/errors.css' %}">
+{% endblock %}
+
+{% block PageContent %}
+    {% include 'header.html' %}
+     <div class="container h-100">
+        <div class="row align-items-center h-100">
+            <div class="col-10 mx-auto error-parent h-100">
+                <div class="jumbotron text-center">
+                    <h1 class="error-code">{{ code }}</h1>
+                    <p class="message-head">We are unable to connect to EMIS at the moment. Please try again later.</p>
+                    <p class="message-secondary">Click
+                        <a href="{% url 'instructions:view_pipeline' %}"><b>here</b></a>
+                        to return to your pipeline view</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block Script %}
+    <script>
+
+    </script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load medi_report_tags %}
+{% load final_report_tags %}
+
+{% block ExtraHead %}
+    <link rel="stylesheet" href="{% static 'medicalreport/css/medicalreport.css' %}">
+{% endblock %}
+
+{% block Content %}
+    <div class="container">
+        <div class="card-deck">
+            <div class="card">
+                <div class="card-body final-report">
+                    <div class="row">
+                        {% include 'medicalreport/medical_report_with_attachments.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-panel" id = "bottom-panel">
+            <div class="container">
+                <button type="button" id="edit-option" data-toggle="modal" data-target="#sharing-options" class="btn btn-primary">Edit sharing options</button>
+                <a href="{{ instruction.medical_with_attachment_report.url }}" class="btn btn-success" download>Download Report</a>
+                <button type="button" class="print-report btn btn-default">Print Report</button>
+            </div>
+        </div>
+    </div>
+    {% include 'medicalreport/modal/final_report_modal.html' %}
+
+{% endblock %}
+{% block Script %}
+    <script src="{% static 'medicalreport/js/medicalreport.js' %}"></script>
+    <script>
+        $('.print-report').click(function(e) {
+            e.preventDefault();
+            var print_win = window.open("{% url 'medicalreport:view_total_report' instruction.id %}");
+            print_win.print();
+        });
+    </script>
+{% endblock %}

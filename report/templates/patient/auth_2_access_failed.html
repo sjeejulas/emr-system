@@ -1,0 +1,25 @@
+{% load static %}
+{% load medi_report_tags %}
+{% load bootstrap4 %}
+{% load get_permissions %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{% block ExtraHead %}
+    <link href="{% static 'css/sign-in.css' %}" rel="stylesheet">
+    <link href="{% static 'css/report/patient_report.css' %}" rel="stylesheet">
+{% endblock %}
+
+<div class="container h-100">
+    <div class="row">
+        <div class="col-sm-3 mt-1">
+            <img class=" mb-3 w-75 medi-logo" src="{% static 'images/logo/eMR_med.png' %}">
+        </div>
+        <div class="col-md-12 mt-5 mb-5 pt-5 pb-5 text-center">
+            <h4>
+                You can login again and accept T&C if you revisit the link in your email...
+            </h4>
+        </div>
+    </div>
+    {% include 'patient/footer.html' %}
+</div>

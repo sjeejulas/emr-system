@@ -1,0 +1,68 @@
+.validate-pass {
+  display: flex;
+}
+
+.validate-pass div:nth-child(1),
+.validate-pass div:nth-child(2),
+.validate-pass div:nth-child(3),
+.validate-pass div:nth-child(4) {
+  height: 5px;
+  margin: 2px;
+  background: rgba(0, 0, 0, 0.2);
+  margin-bottom: 10px;
+}
+
+.validate-pass.very-weak div:nth-child(1) {
+  background: rgb(255, 0, 0);
+}
+
+.validate-pass.weak div:nth-child(1),
+.validate-pass.weak div:nth-child(2) {
+  background: rgb(255, 130, 0);
+}
+
+.validate-pass.good div:nth-child(1),
+.validate-pass.good div:nth-child(2),
+.validate-pass.good div:nth-child(3) {
+  background: rgb(0, 225, 20);
+}
+
+.validate-pass.great div:nth-child(1),
+.validate-pass.great div:nth-child(2),
+.validate-pass.great div:nth-child(3),
+.validate-pass.great div:nth-child(4) {
+  background: rgb(0, 198, 20);
+}
+
+.validate-pass p {
+  font-size: 10px;
+  margin-bottom: 0;
+}
+
+.validate-pass p.very-weak{
+  color: rgb(255, 0, 0);
+}
+
+.validate-pass p.weak{
+  color: rgb(255, 130, 0);
+}
+
+.validate-pass p.good{
+  color: rgb(0, 225, 20);
+}
+
+.validate-pass p.great{
+  color: rgb(0, 178, 20);
+}
+
+.progress-bar-danger {
+  background-color: #d9534f;
+}
+
+.progress-bar-warning {
+  background-color: #f0ad4e;
+}
+
+.progress-bar-success {
+  background-color: #5cb85c;
+}

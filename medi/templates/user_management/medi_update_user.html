@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{% block ExtraHead %}
+    <link href="{% static 'css/select2.min.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/pretty-checkbox.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/management/new_user.css' %}">
+{% endblock %}
+
+{% block Content %}
+    <div class="user-form" id="userForm" style="display: none">
+        <form action="{% url 'accounts:medi_change_user' email=user.email %}" method="post" id="createuser" novalidate>
+            {% csrf_token %}
+            {{ newuser_form.non_field_errors }}
+              
+            {% bootstrap_field newuser_form.password %}
+            <div class="row">
+                <div class="col-md-3 labelText"><label>User Type</label></div>
+                <div class="col-md-4 inputDiv">
+                    {% bootstrap_field newuser_form.user_type %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 labelText"><label>First Name</label></div>
+                <div class="col-md-4 inputDiv">
+                    {% bootstrap_field newuser_form.first_name %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 labelText"><label>Last Name</label></div>
+                <div class="col-md-4 inputDiv">
+                    {% bootstrap_field newuser_form.last_name %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 labelText"><label>Email</label></div>
+                <div class="col-md-4 inputDiv">
+                    {% bootstrap_field newuser_form.email %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 labelText"><label>Username</label></div>
+                <div class="col-md-4 inputDiv">
+                    {% bootstrap_field newuser_form.username %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 labelText"><label>Organisations</label></div>
+                <div class="col-md-4 inputDiv">
+                    {% bootstrap_field newuser_form.gp_organisation %}
+                    {% bootstrap_field newuser_form.client_organisation %}
+                    {% bootstrap_field newuser_form.medi_organisation %}
+                </div>
+            </div>
+            <div class="row" style="display: none" id="user_role">
+                <div class="col-md-3 labelText"><label>Role</label></div>
+                {% bootstrap_field newuser_form.role %}
+                <div class="col-md-4 inputDiv rolebox" id="gp_user_role" style="display: none">
+                    <div class="checkbox rolechk">
+                        <div class="pretty p-default">
+                            <input type="checkbox" id="pm_role" value="0" class="gp_btn"/>
+                            <div class="state p-primary">
+                                <label>Practice Manager</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checkbox rolechk">
+                        <div class="pretty p-default">
+                            <input type="checkbox" id="gp_role" value="1" class="gp_btn"/>
+                            <div class="state p-primary">
+                                <label>GP</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checkbox rolechk">
+                        <div class="pretty p-default">
+                            <input type="checkbox" id="sars_role" value="2" class="gp_btn"/>
+                            <div class="state p-primary">
+                                <label>Other practice staff</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 inputDiv rolebox" id="client_user_role" style="display: none">
+                    <div class="checkbox rolechk">
+                        <div class="pretty p-default">
+                            <input type="checkbox" id="cadmin_role" value="0" class="client_btn"/>
+                            <div class="state p-primary">
+                                <label>Client Manager</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checkbox rolechk">
+                        <div class="pretty p-default">
+                            <input type="checkbox" id="client_role" value="1" class="client_btn"/>
+                            <div class="state p-primary">
+                                <label>Client Administrator</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="paragraph bottom-line top-line" style="display: none;padding-top: 40px;" id="bank_detail">
+                <div class="row banktitle"><label>Bank Details</label></div>
+                <div class="row">
+                    <div class="col-md-3 labelText"><label>Name of Bank</label></div>
+                    <div class="col-md-4 inputDiv">
+                        {% bootstrap_field newuser_form.payment_bank_holder_name %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 labelText"><label>Account Number</label></div>
+                    <div class="col-md-4 inputDiv">
+                        {% bootstrap_field newuser_form.payment_bank_account_number %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 labelText"><label>Sort Code</label></div>
+                    <div class="col-md-4 inputDiv">
+                        <div class="row">
+                            {% bootstrap_field newuser_form.payment_bank_sort_code %}
+                            <div class="sortcode"><input id="sortcode1" type="text" class="form-control" required="true"></div>
+                            <p class="cusline">-</p>
+                            <div class="sortcode"><input id="sortcode2" type="text" class="form-control" required="true"></div>
+                            <p class="cusline">-</p>
+                            <div class="sortcode"><input id="sortcode3" type="text" class="form-control" required="true"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="paragraph">
+                <input id="submitbtn" type="submit" class="btn btn-primary" value="Update">
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/select2.min.js' %}"></script>
+    <script src="{% static 'js/management/management.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#id_medi_organisation').select2();
+            $('#id_client_organisation').select2();
+            $('#id_gp_organisation').select2();
+            $("#passbtn").click(function(){
+                $("input[name=password]").val("medi2018");
+                alert("Password generated");
+            });
+            $("#id_user_type").attr("disabled", "disabled");
+            $("#id_user_type").addClass("disabled-select");
+            $(".gp_btn").change(function() {
+                var checked = $(this).is(':checked');
+                $(".gp_btn").prop('checked',false);
+                if(checked) {
+                    $(this).prop('checked',true);
+                    $("#id_role").val($(this).val());
+                }
+            });
+            $(".client_btn").change(function() {
+                var checked = $(this).is(':checked');
+                $(".client_btn").prop('checked',false);
+                if(checked) {
+                    $(this).prop('checked',true);
+                    $("#id_role").val($(this).val());
+                }
+            });
+            $("#createuser").on("submit", function(event) {
+                $('#id_user_type').prop("disabled", false);
+                var sortcode = $("#sortcode1").val() + $("#sortcode2").val() + $("#sortcode3").val();
+                $("input[name=payment_bank_sort_code").val(sortcode);
+                $("#submitbtn").attr("disabled", "true");
+            });
+            changeUserType($('#id_user_type').val());
+            setDefaultData();
+        });
+    </script>
+{% endblock %}

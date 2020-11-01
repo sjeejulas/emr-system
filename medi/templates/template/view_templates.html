@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link rel="stylesheet" href="{% static 'css/dataTables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/template/template.css' %}">
+{% endblock %}
+
+{% block Content %}
+        <div class="row header-group">
+            <div class="col-md-3">
+                <a href="{% url 'template:new_template' %}" class="btn btn-primary" id="addUserButton">New Template</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                {% render_table table 'django_tables2/bootstrap.html' %}
+                {% bootstrap_pagination  page=table.page pages_to_show=10 size='small' %}
+            </div>
+        </div>
+
+    {% comment %} confirm dialog block {% endcomment %}
+    <div class="modal" role="dialog" id="confirm_delete_modal">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container mt-2 text-center">
+                        <h5>Are you sure you wish to discard this template?</h5>
+                        <div class="col-md-12">&nbsp;</div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a id="remove_link">
+                                    <button class="btn btn-danger btn-block confirm_delete_btn" type="button">Yes</button>
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-secondary btn-block" type="button" data-dismiss="modal">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/dataTables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/dataTables/dataTables.bootstrap4.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#templatesTable').DataTable();
+
+            $('.deleted_btn').click( function() {
+                $('#remove_link').attr('href', $(this).data('link'))
+                $("#confirm_delete_modal").modal("show");
+            });
+
+            $('.confirm_delete_btn').click( function() {
+                return true;
+            });
+        });
+    </script>
+{% endblock %}

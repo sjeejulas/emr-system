@@ -1,0 +1,37 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+<div class="container callout callout--no-padding">
+    <div class="row">
+        <div class="col">
+            <h6 class="callout__header">
+                Referrals
+                <span></span>
+            </h6>
+        </div>
+    </div>
+    <div class="row callout__content">
+        <div class="container">
+            <div>
+            {% for model in referrals %}
+            {% with header=model|general_header body=model|referral_body:locations  %}
+                {% if instruction.type == 'AMRA' %}
+                    {% if not model|is_linked_with_minor_problem:minor_problems_list %}
+                        {% redaction_checkbox_with_body model redaction header word_library sensitive_conditions section='referrals'%}
+                    {% endif %}
+                {% else %}
+                    {% redaction_checkbox_with_body model redaction header word_library sensitive_conditions section='referrals'%}
+                {% endif %}
+            {% endwith %}
+            {% endfor %}
+            </div>
+            <br>
+            <label class="redaction-additional-header" for="redaction_referral_notes">
+                Additional contextual information / missing referrals
+            </label>
+            <textarea placeholder="Further information related to this section" 
+                      name="redaction_referral_notes" 
+                      id="redaction_referral_notes">{{ redaction.referral_notes|default:"" }}</textarea>
+            <button type="submit" class="btn btn-primary float-right update_report_btn">Update</button>
+        </div>
+    </div>
+</div>

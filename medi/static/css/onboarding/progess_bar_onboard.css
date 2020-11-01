@@ -1,0 +1,74 @@
+.top-progress {
+    position: fixed;
+    top: 0px;
+    right: -15px;
+    z-index: 1000;
+    width: 86%;
+    border-radius: 0rem;
+}
+
+.block-img {
+    box-shadow: 4px 4px 5px grey;
+}
+
+.block-username {
+    display: none;
+    padding: 1% 1% 1% 1%;
+}
+
+.another-block {
+    display: none;
+}
+
+.waypoint {
+    border-left: 3px solid;
+    border-left-color: #36569a;
+    height: 35px;
+    position: absolute;
+    margin-top: -9px;
+    text-align: center;
+    padding-top: 25px;
+    color: #333;
+}
+.sub-waypoint {
+    border-right: 2px solid;
+    border-right-color: #36569a;
+    height: 25px;
+    position: absolute;
+    margin-top: -4px;
+    text-align: center;
+    padding-top: 25px;
+    color: #333;
+}
+
+#step1_waypoint {
+    width: calc(20% - 6px);
+}
+
+#step2_waypoint {
+    width: calc(15% - 4px);
+    margin-left: calc(20% - 6px);
+}
+
+#step3_waypoint {
+    width: calc(65% - 20px);
+    margin-left: calc(35% - 11px);
+}
+#step3_subwaypoint1 {
+    margin-left: calc(55% - 17px);
+}
+#step3_subwaypoint2 {
+    margin-left: calc(67% - 21px);
+}
+#step3_subwaypoint3 {
+    margin-left: calc(87% - 27px);
+}
+
+#last_waypoint {
+    margin-left: calc(100% - 30px);
+}
+
+#btn_setup_guide {
+    margin-right: 20px;
+    text-decoration: none;
+}

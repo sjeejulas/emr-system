@@ -1,0 +1,496 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load medi_report_tags %}
+{% load bootstrap4 %}
+{% load get_permissions %}
+{% load cache %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link rel="stylesheet" href="{% static 'medicalreport/css/medicalreport.css' %}">
+    <link rel="stylesheet" href="{% static 'css/library/library.css' %}">
+    <link href="{% static 'css/bootstrap-datepicker.min.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/pretty-checkbox.min.css' %}">
+{% endblock %}
+
+{% block Content %}
+    <div class="container">
+        <div id="overlay"></div>
+        {% cache 300 patient_info_top instruction %}
+        <div class="container-fluid callout callout--top">
+            {% patient_info %}
+        </div>
+        {% if instruction.type == 'SARS' %}
+            <h1>Provisional copy of patient record</h1>
+        {% else %}
+            <h1>Provisional Report Contents</h1>
+        {% endif %}
+        {% endcache %}
+        <form action="{% url 'medicalreport:update_report' instruction.id %}" method="post" id="medicalReportForm">
+            {% csrf_token %}
+            {% if not redaction.instruction_checked and show_alert %}
+                {% cache 300 sensitive_information %}
+                <div class="modal fade" id="form-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content sensitive-information-instructions alert-warning modal-warning-block">
+                            <h6>Sensitive information instructions:</h6>
+                            <ul>
+                                <li>Do not include any history of sensitive conditions (e.g. sexually transmitted infections, terminations of pregnancy, domestic abuse) unless they have long term health implications and the patient consents to disclose such information.</li>
+                                <li>The signing GP must check the report for any errors and remove any references to third parties before submitting a final report.</li>
+                                <li>Do not include information about negative blood borne virus tests (HIV, Hepatitis B, Hepatitis C).</li>
+                                <li>Do not include genetic test results unless there is a favourable test result stating that the patient has not inherited a condition.</li>
+                            </ul>
+                            <p>A full list of sensitive conditions (GP Summary Exclusion Code Lists) can be found<a id="here-link" href="#"> here.</a></p>
+                            <div class="inst_chk">
+                                <div class="pretty p-default right">
+                                    {{ finalise_submit_form.instruction_checked }}
+                                    <div class="state p-primary">
+                                        <label>I understand</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="trud-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-sm">
+                        <div class="modal-content sensitive-information-instructions text-center">
+                            <h6><strong>Sensitive conditions</strong></h6>
+                                <a href="{% url 'medicalreport:trud_ivf' %}" class="btn btn-primary btn-block col-12" role="button" aria-pressed="true">IVF</a>
+                                <a href="{% url 'medicalreport:trud_std' %}" class="btn btn-primary btn-block col-12" role="button" aria-pressed="true">STD</a>
+                                <a href="{% url 'medicalreport:trud_other' %}" class="btn btn-primary btn-block col-12" role="button" aria-pressed="true">Other</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endcache %}
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_profile %}
+                    {% form_medications %}
+                    {% form_consultations %}
+                    {% form_referrals %}
+                </div>
+                <div class="col-md-6">
+                    {% form_significant_problems %}
+                    {% form_allergies %}
+                    {% form_bloods %}
+                    {% form_attachments %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    {% form_addition_answers %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    {% form_comments %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 bg-white" style="background-clip: content-box">
+                    <div class="row">
+                        <div class="col-md-12 pt-3 pb-2 pr-0 pl-0">
+                            <input type="hidden" name="event_flag" id="event_flag">
+                            <div class="row">
+                                <div class="col-md-6 pl-5">
+                                    <button type="button" id="saveDraftButton" onclick="subMitMedicalReport('draft')"
+                                        class="btn btn-primary w-50"><i class="fas fa-save"></i> Save Draft</button>
+                                    <div class="row medicalreport-date">
+                                        <div class="col-md-8 pl-0">
+                                            last updated: {{ redaction.updated_at }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 pr-5">
+                                    <button type="button" id="savePreviewButton" onclick="subMitMedicalReport('preview')"
+                                            class="btn btn-info w-50 float-right">
+                                        Preview and Submit &nbsp;<i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% cache 300 patient_info_modal instruction %}
+    <a href="javascript:;" class="btn btn-primary" id="patient-info-open-modal">Instruction Information</a>
+    <div class="patientInfo" id="patientInfo">
+        {% patient_info %}
+    </div>
+
+    <div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg bg-info">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="col-12 text-center mt-2">
+                            <img src="{% static 'images/custom_images/loading.gif'%}" class="img-fluid">
+                            <div class="col-12">&nbsp;</div>
+                            <h4>Patient : <strong>{{ patient_full_name }}</strong></h4>
+                            <h4 class="mt-2">The medical record or report will be generated soon.</h4>
+                            <label class="text-danger mt-4">Please don't leave this page. Process is running ....</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endcache %}
+
+    <a href="javascript:;" class="" id="report-toolbox-open-modal">
+        <img class="info-icon" id="clinical_info_icon" style="width: 140px" src="{% static 'images/Toolboxfinal.png' %}">
+    </a>
+    <div class="report-toolbox-modal" id="report-toolbox-modal">
+        {% include "library/report_toolbox_modal.html" %}
+    </div>
+    <form method="POST" action="{% url 'library:edit_library' event='add' %}" id="addWordForm">
+        {% csrf_token %}
+        {% include "library/add_word_modal.html" %}
+    </form>
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'medicalreport/js/medicalreport.js' %}"></script>
+    <script>
+        $("#form-modal").modal({
+            backdrop: 'static'
+        });
+        setInterval(function() {
+          $("#alert-message").fadeOut('slow');
+        }, 3000);
+
+        $('#patient-info-open-modal').on('click', function () {
+           $('#patientInfo').toggle();
+        });
+
+        $('#report-toolbox-open-modal').on('click', function () {
+           $('#report-toolbox-modal').toggle();
+        });
+
+        $('input:checkbox[name=redaction_xpaths]').on('change', function() {
+            var me = $(this);
+            me.prop("disabled", true);
+            var xpath = $(this).val();
+            var cheked = $(this).is(':checked');
+            $('input:checkbox[value="'+xpath+'"]').prop('checked', cheked);
+            if(Array.isArray(xpath)) { xpath = xpath[0]; }
+
+            var action = 4;  // remove line redacted
+            if($(this).is(':checked')) { action = 2;  } // line redacted
+
+            var guid = xpath.match('\{([^}]+)\}')[1];
+            var section = $(this).data('section');
+            saveReport();
+            $.ajax({
+                url: "{% url 'library:manual_radact' %}",
+                dataType: "json",
+                data: {
+                    instruction_id: {{ instruction.id }}, 
+                    guid: guid,
+                    section: section,
+                    action: action
+                }
+            }).done(function (response) {
+                me.prop("disabled", false);
+            }).fail(function(response) {
+                create_alert(response.responseJSON.message, 'error');
+            });
+        });
+
+        $(".update_report_btn").on('click', function(event){
+            event.preventDefault(); //prevent default action
+            saveReport();
+        });
+
+        var t_id = null;
+        $('#medicalReportForm').find('input, textarea').not('.form-input').on('change', function () {
+            let form_save_delay = 10000;
+            // remove previews timeout
+            if(t_id){
+                clearTimeout(t_id);
+            }
+            t_id = setTimeout(function () {
+                saveReport();
+            }, form_save_delay)
+        });
+
+        $("input[type='checkbox'][name='instruction_checked']").click(function(){
+            if($(this).is(":checked")){
+                setTimeout(function(){ 
+                    $("#form-modal").modal('hide');
+                    saveReport(true);
+                }, 600);
+            }
+        });
+
+        $('#savePreviewButton').click( function() {
+           $('#loadingModal').modal({
+                backdrop: "static"
+            }); 
+        });
+
+        $('#addWordForm').submit(function(e) {
+            $('#refreshModal').modal({
+                backdrop: 'static'
+            });
+            $('#check_1_icon').addClass('text-success');
+            addWordLibrary();
+            $('#check_2_icon').addClass('text-success');
+            location.reload();
+            $('#check_3_icon').addClass('text-success');
+            return false;
+        });
+
+        var timeoutId;
+        $(".dropdown-options").hide();
+        $(".highlight-library").hover(function() {
+            if (!timeoutId) {
+                var highlight_div = $(this);
+                if (highlight_div.find('.bg-warning').length) {
+                    timeoutId = window.setTimeout(function() {
+                        timeoutId = null;
+                        highlight_div.find('.dropdown-options').slideDown('fast');
+                   }, 400);
+                }
+            }
+        }, function () {
+            if (timeoutId) {
+                window.clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+            else {
+               $(".dropdown-options").slideUp('fast');
+            }
+        });
+
+        function handler_highlight_redact(e) {
+            $(".dropdown-options").hide();
+            e.preventDefault();
+            var word_span = $(this).parent().parent().find("span.bg-warning");
+            var word = word_span.text();
+            var idx = $(this).parent().data('word_idx');
+            var guid = $(this).parent().data('guid');
+            var section = $(this).parent().data('section');
+            var xpath = $(this).parent().parent().parent().parent().children().eq(0).val();
+
+            $.ajax({
+                url: "{% url 'library:redact_word' %}",
+                dataType: "json",
+                data: {
+                    word: word,
+                    instruction_id: {{ instruction.id }},
+                    idx: idx,
+                    guid: guid,
+                    section: section,
+                    xpath: xpath
+                }
+            }).done(function(response) {
+                word_span.removeClass("bg-warning");
+                word_span.addClass('bg-dark').addClass('text-dark');
+                create_alert(response.message, 'success');
+            }).fail(function(response) {
+                create_alert(response.responseJSON.message, 'error');
+            });
+        }
+
+        function handler_highlight_replace(e) {
+            $(".dropdown-options").hide();
+            e.preventDefault();
+            var word_span = $(this).parent().parent().find("span.bg-warning");
+            var word = word_span.text();
+            var idx = $(this).parent().data('word_idx');
+            var guid = $(this).parent().data('guid');
+            var section = $(this).parent().data('section');
+            var xpath = $(this).parent().parent().parent().parent().children().eq(0).val();
+
+            $.ajax({
+                url: "{% url 'library:replace_word' %}",
+                dataType: "json",
+                data: {
+                    word: word,
+                    instruction_id: {{ instruction.id }},
+                    idx: idx,
+                    guid: guid,
+                    section: section,
+                    xpath: xpath
+                }
+            }).done(function(response) {
+                word_span.text(response['replace_word']);
+                word_span.removeClass("bg-warning");
+                word_span.addClass('text-danger');
+                create_alert(response.message, 'success');
+            }).fail(function(response) {
+                create_alert(response.responseJSON.message, 'error');
+            });
+        }
+
+        function handler_highlight_replaceall(e){
+            $(".dropdown-options").hide();
+            e.preventDefault();
+            var word_span = $(this).parent().parent().find("span.bg-warning");
+            var word = word_span.text();
+            $.ajax({
+                url: "{% url 'library:replace_allword' %}",
+                dataType: "json",
+                data: {
+                    word: word,
+                    instruction_id: {{ instruction.id }},
+                }
+            }).done(function(response) {
+                $(".highlight-library .bg-warning").each(function(i, obj) {
+                    if ($(obj).text().toLowerCase() == word.toLowerCase()) {
+                        $(obj).text(response['replace_word']);
+                        $(obj).removeClass("bg-warning");
+                        $(obj).addClass('text-danger');
+                    }
+                });
+                create_alert(response.message, 'success');
+            }).fail(function(response) {
+                create_alert(response.responseJSON.message, 'error');
+            });
+        }
+
+        $(".highlight-redact").on("click", handler_highlight_redact);
+        $(".highlight-replace").on("click", handler_highlight_replace);
+        $(".highlight-replaceall").on("click", handler_highlight_replaceall);
+
+        $('#report-toolbox-modal-undolast').on('click', function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: "{% url 'library:undo_last' %}",
+                dataType: "json",
+                data: { instruction_id: {{ instruction.id }} }
+            }).done(function(response) {
+                var tool_box_information = {};
+                if(response['action'] == 2){
+                    // REDACT LINE case
+                    $('input[data-section="'+ response['section'] + '"][value*="' + response['guid'] +'"]').prop('checked', false);
+                } else if(response['action'] == 4) {
+                    // REMOVE REDACT LINE case
+                    $('input[data-section="'+ response['section'] + '"][value*="' + response['guid'] +'"]').prop('checked', true);
+                } else {
+                    $('span .dropdown-options').each(function () {
+                        var temp_response = response['text'];
+                        if(response['action'] == 1){
+                            // REPLACE ALL case
+                            var section = $(this).data('section');
+                            var parent_element = $(this).parent();
+                            var record_detail = $(this).parent().parent().prop('title').split(' ');
+                            for (let i = 0; i < record_detail.length; i++) {
+                                record_detail[i] = record_detail[i].toUpperCase();
+                            }
+                            var guid = $(this).data('guid');
+                            var word = $(this).prev().text();
+                            var word_length = 1;
+                            var j = 0;
+                            if(word.toUpperCase() == response['new'].toUpperCase()){
+                                if(typeof(tool_box_information[section]) == 'undefined'){
+                                    tool_box_information[section] = {};
+                                    if(typeof(tool_box_information[section][guid] == 'undefined')){
+                                        tool_box_information[section][guid] = {};
+                                        if(typeof(tool_box_information[section][guid][word]) == 'undefined' ){
+                                            word_length = response['old'].split(" ").length;
+                                            for (j=0; j<record_detail.length; j++){
+                                                if(response['old'].toUpperCase() == record_detail.slice(j, j+word_length).join(' ')){
+                                                    tool_box_information[section][guid][word] = j
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if(typeof(tool_box_information[section][guid] == 'undefined')){
+                                        tool_box_information[section][guid] = {};
+                                        if(typeof(tool_box_information[section][guid][word]) == 'undefined' ){
+                                            word_length = response['old'].split(" ").length;
+                                            for (j=0; j<record_detail.length; j++){
+                                                if(response['old'].toUpperCase() == record_detail.slice(j, j+word_length).join(' ')){
+                                                    tool_box_information[section][guid][word] = j
+                                                }
+                                            }
+                                        } else {
+                                            for (j=tool_box_information[section][guid][word]+1; j<record_detail.length; j++){
+                                                if(response['old'].toUpperCase() == record_detail.slice(j, j+word_length).join(' ')){
+                                                    tool_box_information[section][guid][word] = j
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                temp_response = temp_response.replace('dummy-guid', 'data-guid="' + guid + '"');
+                                temp_response = temp_response.replace('dummy-word_idx', 'data-word_idx="' + tool_box_information[section][guid][word] + '"');
+                                temp_response = temp_response.replace('dummy-section', 'data-section="' + section + '"');
+                                $(this).parent().html(temp_response);
+                                parent_element.children().eq(1).data('word_idx', tool_box_information[section][guid][word]);
+                            }
+                        } else {
+                            // REDACT and REAPLACE case
+                            if($(this).data('guid') == response['guid'] && $(this).data('word_idx') == response['word_idx']){
+                                temp_response = temp_response.replace('dummy-guid', 'data-guid="' + response['guid'] + '"');
+                                temp_response = temp_response.replace('dummy-word_idx', 'data-word_idx="' + response['word_idx'] + '"');
+                                temp_response = temp_response.replace('dummy-section', 'data-section="' + response['section'] + '"');
+                                $(this).parent().html(temp_response);
+                            }
+                        }
+                    });
+                }
+                $(".highlight-redact").off("click", handler_highlight_redact);
+                $(".highlight-replace").off("click", handler_highlight_replace);
+                $(".highlight-replaceall").off("click", handler_highlight_replaceall);
+
+                $(".highlight-redact").on("click", handler_highlight_redact);
+                $(".highlight-replace").on("click", handler_highlight_replace);
+                $(".highlight-replaceall").on("click", handler_highlight_replaceall);
+                create_alert('Undo complete.', 'success');
+            }).fail(function(response) {
+                create_alert(response.responseJSON.message, 'error');
+            })
+        });
+
+        $('#report-toolbox-modal-undoall').click( function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: "{% url 'library:undo_all' %}",
+                dataType: "json",
+                data: { instruction_id: {{ instruction.id }} }
+            }).done(function(response) {
+                $('input[name="redaction_xpaths"]').each(function () {
+                    // don't remove sensitive redacted
+                    if($(this).parent().children().last().text() != "Sensitive Condition"){
+                        $(this).prop('checked', false)
+                    }
+                });
+
+                $('span .highlight-library').each(function () {
+                    var index_word = response.new_replace_words.indexOf($(this).children().first().text().toUpperCase());
+                    if(index_word >= 0){
+                        $(this).children().first().text(response.old_replace_words[index_word]);
+                    }
+                    $(this).children().first().removeClass().addClass('bg-warning');
+                });
+                create_alert(response.message, 'success');
+            }).fail(function(response) {
+                create_alert(response.responseJSON.message, 'error');
+            })
+        });
+
+        $('#here-link').click(function(e) {
+            e.preventDefault();
+            $('#trud-modal').modal('show');
+        });
+
+        setInterval(function() {
+          fetchAttachments("{% url 'medicalreport:view_attachment' instruction_id=1 path_file='path' %}");
+        }, 12000);
+
+    </script>
+{% endblock %}

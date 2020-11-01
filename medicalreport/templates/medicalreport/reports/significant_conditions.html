@@ -1,0 +1,40 @@
+{% load medi_report_tags %}
+{% load custom_filters %}
+{% load final_report_tags %}
+<div style="display:flex;background-color:#235597;margin:0;">
+    <label class="header-medical-section">Significant Conditions</label>
+</div>
+<div></div>
+{% if significant_active_problems or significant_past_problems or redaction.significant_problem_notes|default:"" %}
+    <table style="width:100%;font-size:15px;margin-top:10px;">
+      {% if significant_active_problems %}
+          <tr>
+              <td style="font-size:17px;font-weight:bold;">Active</td>
+          </tr>
+          {% for model in significant_active_problems %}
+              {% with header=model|active_problem_header:problem_params %} 
+                  <tr>
+                      <td>{{ header }}</td>
+                  </tr>
+              {% endwith %}
+          {% endfor %}
+      {% endif %}
+      {% if significant_past_problems %}
+          <tr>
+              <td style="font-size:17px;font-weight:bold;">Past</td>
+          </tr>
+          {% for model in significant_past_problems %}
+              {% with header=model|past_problem_header:problem_params %} 
+                  <tr>
+                      <td>{{ header }}</td>
+                  </tr>
+              {% endwith %}
+          {% endfor %}
+      {% endif %}
+      {% if redaction.significant_problem_notes|default:"" %}
+          <tr>
+              <td><label style="font-weight:bold;">Additional contextual information</label> : {{redaction.significant_problem_notes}}</td>
+          </tr>
+      {% endif %}
+    </table>
+{% endif %}

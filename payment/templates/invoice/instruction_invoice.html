@@ -1,0 +1,50 @@
+{% load final_report_tags %}
+{% load static %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Medidata Medical Website">
+        <meta name="author" content="Mohara Ltd.">
+        <title>Instruction Invoice</title>
+        <style>
+            @page {
+                size: a4 portrait;
+                @frame header_frame {
+                    -pdf-frame-content: header_content;
+                    left: 30pt; width: 532pt; top: 30pt; height: 60pt;
+                }
+                @frame content_frame {
+                    left: 30pt; width: 532pt; top: 90pt; height: 632pt;
+                }
+                @frame footer_frame {
+                    -pdf-frame-content: footer_content;
+                    left: 30pt; width: 532pt; top: 720pt; height: 130pt;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        client detail : {{ client_detail.trading_name }} {{ client_detail.legal_name }} {{ client_detail.address }}
+        <br>medidata detail : {{ medi_detail }} {{ medi_detail.payment_bank_holder_name }} {{ medi_detail.payment_bank_account_number }} {{ medi_detail.payment_bank_sort_code }}
+        <br>date invoice : {{ date_detail.date_invoice }}
+        <br>7 days later : {{ date_detail.dute_date }}
+        <br><hr>
+        <br>Instruction detail
+            {% for record in record %}
+                <li>Instruction Number : {{ record.pk }}</li>
+                <li>Instruction Type : {{ record.type }}</li>
+                <li>Instruction Mediref : {{ record.medi_ref }}</li>
+                <li>Instruction Clientref : {{ record.your_ref }}</li>
+                <li>Patient Info : {{ record.patient_information }}</li>
+                <li>Instruction GP Fee : {{ record.gp_earns }}</li>
+                <li>Instruction MDx Fee : {{ record.medi_earns }}</li>
+                <li>Instruction VAT : 20%</li>
+                <li>Instruction Total Fee : {{ record.gp_earns|add:record.medi_earns }}</li>
+                <hr>
+            {% endfor %}
+    </body>
+</html>

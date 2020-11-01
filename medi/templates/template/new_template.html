@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% bootstrap_messages %}
+
+{% block ExtraHead %}
+    <link href="{% static 'css/select2.min.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/template/template.css' %}">
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+{% endblock %}
+
+{% block Content %}
+        <form method="POST" enctype="multipart/form-data" id="templateForm">
+            {% csrf_token %}
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header"><h5>Details</h5></div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2"><b>Title <span class="red">*</span></b></div>
+                            <div class="col-md-6">
+                                {% bootstrap_field template_form.template_title placeholder='' show_label=false %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2"><b>Description <span class="red">*</span></b></div>
+                            <div class="col-md-6">
+                                {% bootstrap_field template_form.description placeholder='' show_label=false %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2"><b>Common Conditions of Interest <span class="red">*</span></b></div>
+                            {% bootstrap_field template_form.common_snomed_concepts placeholder='' show_label=false form_group_class='form-group col-md-10' %}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2">Addition Conditions of Interest</div>
+                            {% bootstrap_field template_form.addition_condition size='small' form_group_class='form-group col-md-6' show_label=False %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 mt-3">
+                <div class="card">
+                    <div class="card-header"><h5>Addition Question</h5></div>
+                    <div class="card-body">
+                        <div class="row" id="questions_block">
+                            {{ question_formset.management_form }}
+                            <table border="0" cellpadding="10" cellspacing="0" class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Questions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for form in question_formset.forms %}
+                                        <tr>
+                                            <td>{{ form.question }}{{ form.id }}{{ form.template_instruction }}</td>
+                                            <td/>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 mt">
+                <div class="row">
+                    <div class="col-md-2 mt-3">
+                        {% bootstrap_button content='Submit' button_type='submit' size='medium' button_class='btn btn-primary'  %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block Script %}
+    <script src="{% static 'js/select2.min.js' %}"></script>
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+    <script src="{% static 'js/template/new_template.js' %}"></script>
+    <script>
+    $(document).ready(function () {
+      var conditions = {{ conditions|safe|escape }};
+      $('#templateForm tbody tr').formset({
+          'deleteText': 'X remove',
+          'addText': '+ Add Another',
+          'addCssClass': 'btn btn-primary',
+          'deleteCssClass': 'btn btn-danger'
+      });
+      render_common_conditions();
+      render_addition_conditions(conditions);
+      $('#id_addition_condition').select2({
+        minimumInputLength: 3,
+        width: 500,
+        multiple: true,
+        ajax: {
+            url: "{% url 'snomedct:query_snomed' %}",
+            data: function (params) {
+                let query = {
+                    keyword: params.term,
+                };
+                return query;
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                }
+            }
+        }
+      });
+    });
+    </script>
+{% endblock %}
